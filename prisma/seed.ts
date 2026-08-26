@@ -491,6 +491,7 @@ async function main() {
   }
 
   await seedStarterCatalog();
+  await seedVisaGuides();
 }
 
 function program(
@@ -708,6 +709,273 @@ async function seedStarterCatalog() {
         }
       }
     });
+  }
+}
+
+type VisaCategory =
+  | "REQUIRED_DOCUMENTS"
+  | "FINANCIAL_PROOF"
+  | "EMBASSY_INFO"
+  | "PROCESSING_TIMELINE"
+  | "VISA_FEES"
+  | "COMMON_MISTAKES";
+
+type StarterVisaGuideEntry = {
+  category: VisaCategory;
+  headline: string;
+  detail: string;
+  costUsd?: number;
+  sourceLabel?: string;
+  sourceUrl?: string;
+  severity?: number;
+};
+
+type StarterVisaGuide = {
+  countryName: string;
+  entries: StarterVisaGuideEntry[];
+};
+
+const visaGuideCatalog: StarterVisaGuide[] = [
+  {
+    countryName: "Canada",
+    entries: [
+      {
+        category: "REQUIRED_DOCUMENTS",
+        headline: "Core study permit documents",
+        detail: "Letter of acceptance from a Designated Learning Institution (DLI), a valid passport, proof of financial support, a statement of purpose, passport-sized photos, and a police clearance certificate if requested."
+      },
+      {
+        category: "FINANCIAL_PROOF",
+        headline: "Proof of funds requirement",
+        detail: "Show funds covering tuition plus living costs for one year, e.g. a GIC (Guaranteed Investment Certificate), bank statements, or a scholarship or loan letter.",
+        costUsd: 15500
+      },
+      {
+        category: "EMBASSY_INFO",
+        headline: "Apply through IRCC",
+        detail: "Study permits are processed by Immigration, Refugees and Citizenship Canada (IRCC); most applicants apply online through the IRCC portal rather than visiting an embassy in person.",
+        sourceLabel: "IRCC — Study in Canada",
+        sourceUrl: "https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada.html"
+      },
+      {
+        category: "PROCESSING_TIMELINE",
+        headline: "Typical processing time",
+        detail: "Standard study permit processing takes about 8-12 weeks; the Student Direct Stream, where eligible, can be faster at around 3-5 weeks. Apply as soon as you receive your letter of acceptance."
+      },
+      {
+        category: "VISA_FEES",
+        headline: "Study permit application fee",
+        detail: "The federal study permit fee plus the biometrics fee is due at the time of application.",
+        costUsd: 110
+      },
+      {
+        category: "COMMON_MISTAKES",
+        headline: "Frequent rejection reasons",
+        detail: "Weak or unclear proof of funds, an ambiguous statement of purpose, and inconsistent travel or study history are the most common reasons Canadian study permits get refused.",
+        severity: 4
+      }
+    ]
+  },
+  {
+    countryName: "Australia",
+    entries: [
+      {
+        category: "REQUIRED_DOCUMENTS",
+        headline: "Subclass 500 checklist",
+        detail: "Confirmation of Enrolment (CoE), passport, Genuine Temporary Entrant (GTE) statement, Overseas Student Health Cover (OSHC), academic transcripts, and English test results."
+      },
+      {
+        category: "FINANCIAL_PROOF",
+        headline: "Financial capacity requirement",
+        detail: "Demonstrate funds for tuition, travel, and 12 months of living costs, either through savings, education loans, or a combination of income and savings.",
+        costUsd: 18500
+      },
+      {
+        category: "EMBASSY_INFO",
+        headline: "Apply via ImmiAccount",
+        detail: "Student visa applications are lodged online through the Department of Home Affairs' ImmiAccount portal.",
+        sourceLabel: "Department of Home Affairs — Student visa (500)",
+        sourceUrl: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500"
+      },
+      {
+        category: "PROCESSING_TIMELINE",
+        headline: "Typical processing time",
+        detail: "Most subclass 500 applications are finalised within 4-6 weeks, though this varies by nationality and visa office workload."
+      },
+      {
+        category: "VISA_FEES",
+        headline: "Student visa application charge",
+        detail: "The base application charge is one of the higher visa fees among major study destinations.",
+        costUsd: 1050
+      },
+      {
+        category: "COMMON_MISTAKES",
+        headline: "Frequent rejection reasons",
+        detail: "A weak GTE statement, insufficient financial evidence, and gaps in study history are the leading causes of subclass 500 refusals.",
+        severity: 4
+      }
+    ]
+  },
+  {
+    countryName: "Germany",
+    entries: [
+      {
+        category: "REQUIRED_DOCUMENTS",
+        headline: "National (D) visa checklist",
+        detail: "Letter of admission, passport, biometric photos, proof of health insurance, academic certificates, and proof of a blocked account or scholarship."
+      },
+      {
+        category: "FINANCIAL_PROOF",
+        headline: "Blocked account requirement",
+        detail: "Open a Sperrkonto (blocked account) and deposit the annual minimum living-cost amount before applying; funds are released monthly once you arrive.",
+        costUsd: 12500
+      },
+      {
+        category: "EMBASSY_INFO",
+        headline: "Apply at the German embassy or consulate",
+        detail: "Book a national visa appointment at the German embassy or consulate in your home country; processing typically starts only after the appointment.",
+        sourceLabel: "Make it in Germany — Visa guide",
+        sourceUrl: "https://www.make-it-in-germany.com"
+      },
+      {
+        category: "PROCESSING_TIMELINE",
+        headline: "Typical processing time",
+        detail: "German student visa processing usually takes 6-12 weeks, but appointment availability at the embassy can add significant extra delay, so book early."
+      },
+      {
+        category: "VISA_FEES",
+        headline: "National visa fee",
+        detail: "A flat national visa application fee is payable at the embassy appointment.",
+        costUsd: 85
+      },
+      {
+        category: "COMMON_MISTAKES",
+        headline: "Frequent rejection reasons",
+        detail: "Opening the blocked account too late, incomplete health insurance proof, and missing embassy appointment slots are the most common issues applicants face.",
+        severity: 4
+      }
+    ]
+  },
+  {
+    countryName: "United Kingdom",
+    entries: [
+      {
+        category: "REQUIRED_DOCUMENTS",
+        headline: "Student route checklist",
+        detail: "Confirmation of Acceptance for Studies (CAS), a valid passport, proof of finances, tuberculosis test results (if applicable), and academic qualifications."
+      },
+      {
+        category: "FINANCIAL_PROOF",
+        headline: "Maintenance funds requirement",
+        detail: "Hold the required maintenance funds in your bank account for a consecutive 28-day period before applying, covering tuition and living costs.",
+        costUsd: 15000
+      },
+      {
+        category: "EMBASSY_INFO",
+        headline: "Apply online via UKVI",
+        detail: "Student route visas are applied for online through UK Visas and Immigration (UKVI); most applicants also complete biometrics at a local visa application centre.",
+        sourceLabel: "UK Government — Student visa",
+        sourceUrl: "https://www.gov.uk/student-visa"
+      },
+      {
+        category: "PROCESSING_TIMELINE",
+        headline: "Typical processing time",
+        detail: "Standard UKVI decisions are usually made within 3 weeks of your biometric appointment; priority services can speed this up for an extra fee."
+      },
+      {
+        category: "VISA_FEES",
+        headline: "Visa fee and Immigration Health Surcharge",
+        detail: "The visa application fee is charged alongside the Immigration Health Surcharge (IHS), which is paid upfront for the full length of your course.",
+        costUsd: 650
+      },
+      {
+        category: "COMMON_MISTAKES",
+        headline: "Frequent rejection reasons",
+        detail: "Breaking the 28-day fund-holding rule, CAS details not matching the application, and outdated financial evidence are the most common causes of refusal.",
+        severity: 4
+      }
+    ]
+  },
+  {
+    countryName: "United States",
+    entries: [
+      {
+        category: "REQUIRED_DOCUMENTS",
+        headline: "F-1 visa checklist",
+        detail: "Form I-20 from your SEVP-certified school, a valid passport, DS-160 confirmation page, SEVIS fee receipt, and financial documentation."
+      },
+      {
+        category: "FINANCIAL_PROOF",
+        headline: "Proof of financial support",
+        detail: "Show sufficient funds to cover one year of tuition and living costs through bank statements, sponsor affidavits, or scholarship letters.",
+        costUsd: 30000
+      },
+      {
+        category: "EMBASSY_INFO",
+        headline: "Apply through a U.S. embassy or consulate",
+        detail: "Schedule your F-1 visa interview at a U.S. embassy or consulate after paying the SEVIS fee and completing the DS-160 form.",
+        sourceLabel: "U.S. Department of State — Student visa",
+        sourceUrl: "https://travel.state.gov/content/travel/en/us-visas/study/student-visa.html"
+      },
+      {
+        category: "PROCESSING_TIMELINE",
+        headline: "Typical processing time",
+        detail: "Interview wait times vary widely by location and season, from a few days to several months, so book your interview slot as early as possible after receiving your I-20."
+      },
+      {
+        category: "VISA_FEES",
+        headline: "SEVIS fee and visa application fee",
+        detail: "The SEVIS I-901 fee is paid before the interview, in addition to the standard nonimmigrant visa application fee (MRV fee).",
+        costUsd: 535
+      },
+      {
+        category: "COMMON_MISTAKES",
+        headline: "Frequent rejection reasons",
+        detail: "Failing to demonstrate strong ties to your home country, weak financial documentation, and inconsistent answers during the visa interview are the leading causes of F-1 refusals.",
+        severity: 4
+      }
+    ]
+  }
+];
+
+async function seedVisaGuides() {
+  for (const guide of visaGuideCatalog) {
+    const country = await prisma.country.findUnique({
+      where: { name: guide.countryName },
+      select: { id: true }
+    });
+
+    if (!country) {
+      continue;
+    }
+
+    for (const entry of guide.entries) {
+      const entryFields = {
+        detail: entry.detail,
+        costUsd: entry.costUsd ?? null,
+        sourceLabel: entry.sourceLabel ?? null,
+        sourceUrl: entry.sourceUrl ?? null,
+        severity: entry.severity ?? 3,
+        isPublished: true
+      };
+
+      await prisma.visaGuide.upsert({
+        where: {
+          countryId_category_headline: {
+            countryId: country.id,
+            category: entry.category,
+            headline: entry.headline
+          }
+        },
+        update: entryFields,
+        create: {
+          countryId: country.id,
+          category: entry.category,
+          headline: entry.headline,
+          ...entryFields
+        }
+      });
+    }
   }
 }
 

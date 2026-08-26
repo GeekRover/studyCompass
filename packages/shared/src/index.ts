@@ -348,4 +348,30 @@ export const fundingGapAnalyzeSchema = z.object({
 export type FundingGapStatus = z.infer<typeof fundingGapStatusSchema>;
 export type FundingGapAnalyzeInput = z.infer<typeof fundingGapAnalyzeSchema>;
 
+// ---------------------------------------------------------------------------
+// Module 4 · Feature 3 — Visa Preparation Hub
+// ---------------------------------------------------------------------------
+export const visaCategorySchema = z.enum([
+  "REQUIRED_DOCUMENTS",
+  "FINANCIAL_PROOF",
+  "EMBASSY_INFO",
+  "PROCESSING_TIMELINE",
+  "VISA_FEES",
+  "COMMON_MISTAKES"
+]);
+
+export const visaGuideCreateSchema = z.object({
+  countryId: z.string().min(1, "countryId is required"),
+  category: visaCategorySchema,
+  headline: z.string().min(3).max(160),
+  detail: z.string().min(10).max(2000),
+  costUsd: z.coerce.number().min(0).optional().nullable(),
+  sourceLabel: z.string().max(160).optional().nullable(),
+  sourceUrl: z.string().url().optional().nullable(),
+  severity: z.coerce.number().int().min(1).max(5).default(3),
+  isPublished: z.boolean().optional().default(false)
+});
+
+export type VisaCategory = z.infer<typeof visaCategorySchema>;
+export type VisaGuideCreateInput = z.infer<typeof visaGuideCreateSchema>;
 
