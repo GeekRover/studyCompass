@@ -2,6 +2,7 @@ import {
   Bell,
   Bookmark,
   Bot,
+  Calculator,
   CalendarDays,
   ChevronDown,
   ClipboardList,
@@ -11,6 +12,7 @@ import {
   GraduationCap,
   LogOut,
   MessageCircle,
+  Plane,
   Search,
   Settings,
   ShieldCheck,
@@ -47,6 +49,16 @@ const navItems = [
     label: "Country Decision",
     to: "/countries",
     icon: Globe2
+  },
+  {
+    label: "Cost Calculator",
+    to: "/cost-calculator",
+    icon: Calculator
+  },
+  {
+    label: "Visa Prep Hub",
+    to: "/visa-hub",
+    icon: Plane
   },
   {
     label: "Application Tracker",

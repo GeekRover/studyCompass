@@ -91,6 +91,15 @@ enum FundingGapStatus {
   MAJOR_GAP
 }
 
+enum VisaCategory {
+  REQUIRED_DOCUMENTS
+  FINANCIAL_PROOF
+  EMBASSY_INFO
+  PROCESSING_TIMELINE
+  VISA_FEES
+  COMMON_MISTAKES
+}
+
 model User {
   id                   String                     @id @default(cuid())
   name                 String
@@ -163,6 +172,7 @@ model Country {
   updatedAt                  DateTime      @updatedAt
   universities               University[]
   scholarships               Scholarship[]
+  visaGuides                 VisaGuide[]
 }
 
 model University {
@@ -511,4 +521,28 @@ model FundingGapItem {
 
   @@index([analysisId])
   @@index([programId])
+}
+
+// ---------------------------------------------------------------------------
+// Module 4 · Feature 3 — Visa Preparation Hub
+// Country-specific visa guidance curated by Content Managers, read by Students.
+// ---------------------------------------------------------------------------
+model VisaGuide {
+  id          String       @id @default(cuid())
+  countryId   String
+  category    VisaCategory
+  headline    String
+  detail      String
+  costUsd     Float?
+  sourceLabel String?
+  sourceUrl   String?
+  severity    Int          @default(3)
+  isPublished Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  country     Country      @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  @@unique([countryId, category, headline])
+  @@index([countryId, category])
+  @@index([isPublished])
 }

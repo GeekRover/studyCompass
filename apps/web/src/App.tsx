@@ -4,6 +4,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AiAdvisorPage } from "./pages/AiAdvisorPage";
 import { ApplicationStrategyPage } from "./pages/ApplicationStrategyPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { CostCalculatorPage } from "./pages/CostCalculatorPage";
 import { CountriesPage } from "./pages/CountriesPage";
 import { DeadlinesPage } from "./pages/DeadlinesPage";
 import { DocumentsPage } from "./pages/DocumentsPage";
@@ -15,6 +16,7 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { SavedScholarshipsPage } from "./pages/SavedScholarshipsPage";
 import { ScholarshipDetailsPage } from "./pages/ScholarshipDetailsPage";
 import { ScholarshipsPage } from "./pages/ScholarshipsPage";
+import { VisaHubPage } from "./pages/VisaHubPage";
 
 export function App() {
   return (
@@ -40,6 +42,8 @@ export function App() {
         <Route path="deadlines" element={<DeadlinesPage />} />
         <Route path="documents" element={<DocumentsPage />} />
         <Route path="countries" element={<CountriesPage />} />
+        <Route path="cost-calculator" element={<CostCalculatorPage />} />
+        <Route path="visa-hub" element={<VisaHubPage />} />
         <Route path="advisor" element={<AiAdvisorPage />} />
         <Route path="ai-advisor" element={<Navigate to="/advisor" replace />} />
       </Route>
