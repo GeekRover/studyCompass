@@ -190,6 +190,12 @@ export type AdvisorNextStepItem = {
   actionLabel?: string;
 };
 
+export type AdvisorLlmInfo = {
+  provider: "grok" | "rule-based";
+  model?: string;
+  isLlmActive: boolean;
+};
+
 export type AdvisorResponse = {
   answer: string;
   mode: "GENERAL" | "UNIVERSITY" | "COUNTRY" | "INSIGHTS" | "NEXT_STEPS";
@@ -215,6 +221,7 @@ export type AdvisorResponse = {
     budgetFit: string;
   }>;
   disclaimer: string;
+  llmInfo?: AdvisorLlmInfo;
 };
 
 export type AdvisorContextResponse = {
@@ -247,6 +254,7 @@ export type AdvisorContextResponse = {
     id: string;
     name: string;
   }>;
+  llmInfo?: AdvisorLlmInfo;
 };
 
 export type OpportunityFeedItemType = "SCHOLARSHIP" | "DEADLINE" | "UNIVERSITY" | "VISA_INSIGHT" | "REQUIREMENT_CHANGE";

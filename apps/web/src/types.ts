@@ -354,6 +354,7 @@ export type {
   AdvisorContextResponse,
   AdvisorExplainUniversityInput,
   AdvisorInsightsInput,
+  AdvisorLlmInfo,
   AdvisorMessage,
   AdvisorMessageRole,
   AdvisorNextStepItem,

@@ -11,9 +11,15 @@ import type {
 } from "@study-abroad/shared";
 import { prisma } from "../lib/prisma.js";
 import { buildCountryDecision } from "./country-decision.service.js";
+import {
+  callGrokChatCompletion,
+  extractJsonFromGrokResponse,
+  getGrokModelName,
+  isGrokConfigured
+} from "../lib/grok.js";
 
 const ADVISOR_DISCLAIMER =
-  "Note: StudyCompass AI Advisor provides personalized advisory insights based on your student profile and platform database facts. It complements and explains the rule-based matching system but does not override official university admission criteria or deterministic matching rules.";
+  "Note: StudyCompass AI Advisor provides personalized advisory insights grounded in your student profile and platform database facts. It complements and explains the rule-based matching system but does not override official university admission criteria or deterministic matching rules.";
 
 export class AdvisorServiceError extends Error {
   statusCode: number;
@@ -112,19 +118,30 @@ export async function getAdvisorContext(userId: string): Promise<AdvisorContextR
     name: c.name
   }));
 
+  const grokActive = isGrokConfigured();
+
   return {
     profileSummary,
     samplePrompts,
     availablePrograms,
-    availableCountries
+    availableCountries,
+    llmInfo: {
+      provider: grokActive ? "grok" : "rule-based",
+      model: grokActive ? getGrokModelName() : undefined,
+      isLlmActive: grokActive
+    }
   };
 }
 
+/**
+ * Explains university suitability using Grok LLM reasoning grounded in platform admission criteria.
+ */
 export async function explainUniversitySuitability(
   userId: string,
   input: AdvisorExplainUniversityInput
 ): Promise<AdvisorResponse> {
-  const { profile, readinessScores, matches, countryDecisions } = await getStudentContextData(userId);
+  const context = await getStudentContextData(userId);
+  const { profile, matches, countryDecisions } = context;
 
   const program = await prisma.program.findUnique({
     where: { id: input.programId },
@@ -148,7 +165,6 @@ export async function explainUniversitySuitability(
   const budgetFit = profile.budgetUsd >= program.tuitionUsd;
   const cgpaMet = normalizedCgpa >= program.minCgpa;
   const englishMet = !program.minIelts || englishScore >= program.minIelts;
-  const greMet = !program.minGre || Boolean(profile.greScore && profile.greScore >= program.minGre);
   const category = match?.category ?? (cgpaMet && englishMet && budgetFit ? "TARGET" : "REACH");
   const countryName = program.university.country.name;
   const countryDec = countryDecisions.find((c) => c.name.toLowerCase() === countryName.toLowerCase());
@@ -164,6 +180,147 @@ export async function explainUniversitySuitability(
     take: 3
   });
 
+  const defaultReferencedEntities: AdvisorReferencedEntity[] = [
+    {
+      type: "PROGRAM",
+      id: program.id,
+      name: program.title,
+      badge: category,
+      subtext: `${program.university.name} • $${program.tuitionUsd.toLocaleString()}/yr`,
+      link: "/matches"
+    },
+    {
+      type: "COUNTRY",
+      id: program.university.country.id,
+      name: countryName,
+      badge: `${countryDec?.postStudyWorkVisaMonths ?? 24}mo PSW`,
+      subtext: `Living Cost: ~$${(countryDec?.averageLivingCostUsd ?? 1000).toLocaleString()}/mo`,
+      link: "/countries"
+    }
+  ];
+
+  for (const s of matchingScholarships) {
+    defaultReferencedEntities.push({
+      type: "SCHOLARSHIP",
+      id: s.id,
+      name: s.name,
+      badge: s.coverageType,
+      subtext: s.amountUsd ? `Up to $${s.amountUsd.toLocaleString()}` : "Tuition coverage",
+      link: `/scholarships/${s.id}`
+    });
+  }
+
+  // LLM Invocation via Grok
+  if (isGrokConfigured()) {
+    try {
+      const systemPrompt = `You are the StudyCompass AI Study Abroad Admissions Advisor, powered by xAI Grok.
+Your role is to provide realistic, encouraging, and highly specific university suitability evaluations for international students.
+You must ground your reasoning directly on the student profile data and database program criteria provided.
+Respond in valid JSON format matching this exact schema:
+{
+  "answer": "Comprehensive Markdown evaluation explaining why the program was classified as ${category}, detailing academic alignment, financial feasibility, post-study career prospects in ${countryName}, application strengths, and strategic next actions.",
+  "keyTakeaways": ["string bullet 1", "string bullet 2", "string bullet 3", "string bullet 4"],
+  "suggestedFollowUps": ["question 1", "question 2", "question 3", "question 4"],
+  "suitabilityScore": {
+    "overallFit": ${match?.score ?? (category === "SAFE" ? 85 : category === "TARGET" ? 72 : 55)},
+    "category": "${category}",
+    "academicFit": "${cgpaMet ? "Strong Fit" : "Academic Stretch"}",
+    "budgetFit": "${budgetFit ? "Within Budget" : "Budget Gap"}",
+    "englishFit": "${englishMet ? "Requirements Met" : "Test Retake Recommended"}"
+  }
+}`;
+
+      const userPrompt = `Evaluate the following university program suitability for the student:
+Student Profile:
+- Name: ${profile.user?.name ?? "Student"} (${profile.nationality})
+- Target Degree & Field: ${profile.targetDegree} in ${profile.fieldOfStudy}
+- GPA: ${normalizedCgpa.toFixed(2)} / 4.0 (${profile.cgpa}/${profile.cgpaScale})
+- English Proficiency: ${profile.ieltsScore ? `IELTS ${profile.ieltsScore}` : profile.toeflScore ? `TOEFL ${profile.toeflScore}` : "Not provided"}
+- GRE Score: ${profile.greScore ?? "None"}
+- Annual Budget: $${profile.budgetUsd.toLocaleString()} USD
+- Research Publications: ${profile.researchPapers}
+- Work Experience: ${profile.workExperienceMonths} months
+
+Target Program Details:
+- University: ${program.university.name} (${program.university.city}, ${countryName})
+- Ranking Band: ${program.university.rankingBand}
+- Program Title: ${program.title} (${program.degreeLevel})
+- Annual Tuition: $${program.tuitionUsd.toLocaleString()} USD
+- Min GPA Required: ${program.minCgpa.toFixed(2)} / 4.0
+- Min IELTS Required: ${program.minIelts ?? "None specified"}
+- Min GRE Required: ${program.minGre ?? "None specified"}
+- Research Orientation: ${program.researchPreferred ? "Research-Focused" : "Coursework-Focused"}
+- Platform Match Classification: ${category} (Score: ${match?.score ?? 75}/100)
+
+Country Context (${countryName}):
+- Post-Study Work Visa: ${countryDec?.postStudyWorkVisaMonths ?? 24} months
+- Part-Time Work Allowed: ${countryDec?.partTimeWorkHours ?? 20} hrs/week
+- Average Living Cost: ~$${(countryDec?.averageLivingCostUsd ?? 1000).toLocaleString()}/month
+- Job Market Strength: ${countryDec?.meta?.jobMarketStrength ?? "Strong"}
+
+Matching Scholarships in Database:
+${matchingScholarships.map((s) => `- ${s.name} (${s.coverageType}, amount: $${s.amountUsd ?? "Variable"})`).join("\n") || "No specific institutional scholarships; standard financial aid applies."}
+
+User Specific Question: "${input.question || `Why is ${program.university.name} classified as ${category} and how suitable is it for me?`}"`;
+
+      const llmOutput = await callGrokChatCompletion({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.35,
+        responseFormat: { type: "json_object" }
+      });
+
+      const parsed = extractJsonFromGrokResponse<{
+        answer: string;
+        keyTakeaways: string[];
+        suggestedFollowUps: string[];
+        suitabilityScore?: {
+          overallFit: number;
+          category: "SAFE" | "TARGET" | "REACH";
+          academicFit: string;
+          budgetFit: string;
+          englishFit: string;
+        };
+      }>(llmOutput);
+
+      return {
+        answer: parsed.answer,
+        mode: "UNIVERSITY",
+        keyTakeaways: parsed.keyTakeaways ?? [
+          `Categorized as ${category} with a match score of ${match?.score ?? 75}/100.`,
+          cgpaMet ? "Meets minimum CGPA requirements." : "CGPA is below standard cutoff; projects/research needed.",
+          budgetFit ? "Tuition is fully within declared budget." : "Scholarship or financial planning required to bridge tuition gap.",
+          `${countryName} provides ${countryDec?.postStudyWorkVisaMonths ?? 24} months of post-study work authorization.`
+        ],
+        suggestedFollowUps: parsed.suggestedFollowUps ?? [
+          `What scholarships are available for ${program.university.name}?`,
+          `How does ${program.university.name} compare to other universities in ${countryName}?`,
+          `What documents do I need to prepare for ${program.title}?`,
+          `How can I move this program from ${category} to Safe?`
+        ],
+        referencedEntities: defaultReferencedEntities,
+        suitabilityScore: parsed.suitabilityScore ?? {
+          overallFit: match?.score ?? 75,
+          category,
+          academicFit: cgpaMet ? "Strong Fit" : "Academic Stretch",
+          budgetFit: budgetFit ? "Within Budget" : "Budget Gap",
+          englishFit: englishMet ? "Requirements Met" : "Moderate Fit"
+        },
+        disclaimer: ADVISOR_DISCLAIMER,
+        llmInfo: {
+          provider: "grok",
+          model: getGrokModelName(),
+          isLlmActive: true
+        }
+      };
+    } catch (err) {
+      console.warn("Grok LLM call failed for explainUniversitySuitability, falling back to rule-based generation:", err);
+    }
+  }
+
+  // Deterministic Fallback
   const academicFit = cgpaMet
     ? `Strong Fit: Your GPA (${normalizedCgpa.toFixed(2)}/4.0) meets or exceeds the required minimum (${program.minCgpa.toFixed(2)}).`
     : `Academic Stretch: Your GPA (${normalizedCgpa.toFixed(2)}/4.0) is slightly below the recommended minimum (${program.minCgpa.toFixed(2)}).`;
@@ -210,36 +367,6 @@ export async function explainUniversitySuitability(
 2. **Explore Scholarships**: Look into matching financial aid (e.g. ${matchingScholarships.map((s) => s.name).join(", ") || "institutional merit waivers"}).
 3. **Statement of Purpose**: Emphasize your background in ${profile.fieldOfStudy} and career goals in ${profile.careerGoal ?? "global technology"}.`;
 
-  const referencedEntities: AdvisorReferencedEntity[] = [
-    {
-      type: "PROGRAM",
-      id: program.id,
-      name: program.title,
-      badge: category,
-      subtext: `${program.university.name} • $${program.tuitionUsd.toLocaleString()}/yr`,
-      link: "/matches"
-    },
-    {
-      type: "COUNTRY",
-      id: program.university.country.id,
-      name: countryName,
-      badge: `${countryDec?.postStudyWorkVisaMonths ?? 24}mo PSW`,
-      subtext: `Living Cost: ~$${(countryDec?.averageLivingCostUsd ?? 1000).toLocaleString()}/mo`,
-      link: "/countries"
-    }
-  ];
-
-  for (const s of matchingScholarships) {
-    referencedEntities.push({
-      type: "SCHOLARSHIP",
-      id: s.id,
-      name: s.name,
-      badge: s.coverageType,
-      subtext: s.amountUsd ? `Up to $${s.amountUsd.toLocaleString()}` : "Tuition coverage",
-      link: `/scholarships/${s.id}`
-    });
-  }
-
   return {
     answer,
     mode: "UNIVERSITY",
@@ -255,7 +382,7 @@ export async function explainUniversitySuitability(
       `What documents do I need to prepare for ${program.title}?`,
       `How can I move this program from ${category} to Safe?`
     ],
-    referencedEntities,
+    referencedEntities: defaultReferencedEntities,
     suitabilityScore: {
       overallFit: match?.score ?? 75,
       category,
@@ -263,10 +390,17 @@ export async function explainUniversitySuitability(
       budgetFit: budgetFit ? "High" : "Low",
       englishFit: englishMet ? "High" : "Moderate"
     },
-    disclaimer: ADVISOR_DISCLAIMER
+    disclaimer: ADVISOR_DISCLAIMER,
+    llmInfo: {
+      provider: "rule-based",
+      isLlmActive: false
+    }
   };
 }
 
+/**
+ * Compares study destinations using Grok LLM reasoning grounded in multi-criteria platform facts.
+ */
 export async function compareCountriesForStudent(
   userId: string,
   input: AdvisorCompareCountriesInput
@@ -292,6 +426,94 @@ export async function compareCountriesForStudent(
     budgetFit: c.decision.budgetFit
   }));
 
+  const referencedEntities: AdvisorReferencedEntity[] = selectedCountries.map((c) => ({
+    type: "COUNTRY",
+    id: c.id,
+    name: c.name,
+    badge: `${c.decision.decisionScore}/100 Score`,
+    subtext: `$${c.decision.estimatedAnnualCostUsd.toLocaleString()}/yr • ${c.postStudyWorkVisaMonths}mo PSW`,
+    link: "/countries"
+  }));
+
+  if (isGrokConfigured()) {
+    try {
+      const systemPrompt = `You are the StudyCompass AI Study Abroad Consultant, powered by xAI Grok.
+Compare international study destinations for this student. Use grounded platform data and realistic immigration/job market facts.
+Return a structured JSON response matching this schema:
+{
+  "answer": "Rich Markdown comparison breakdown with sections: 1. Multi-factor breakdown table, 2. Country-by-country deep dive for student's field, 3. Strategic verdict & recommendations for budget, post-study work visa, and PR pathways.",
+  "keyTakeaways": ["takeaway 1", "takeaway 2", "takeaway 3", "takeaway 4"],
+  "suggestedFollowUps": ["followup 1", "followup 2", "followup 3", "followup 4"]
+}`;
+
+      const userPrompt = `Compare these countries for the student:
+Student Profile:
+- Name: ${profile.user?.name ?? "Student"} (${profile.nationality})
+- Field: ${profile.fieldOfStudy} (${profile.targetDegree})
+- Annual Budget: $${profile.budgetUsd.toLocaleString()} USD
+- GPA: ${(profile.cgpa / profile.cgpaScale * 4).toFixed(2)}/4.0
+
+Selected Countries Data:
+${selectedCountries
+  .map(
+    (c) => `Country: ${c.name}
+- Region: ${c.meta.region}
+- Decision Score: ${c.decision.decisionScore}/100
+- Est. Annual Total Cost: $${c.decision.estimatedAnnualCostUsd.toLocaleString()} USD
+- Average Living Cost: $${c.averageLivingCostUsd.toLocaleString()} USD/mo
+- Post-Study Work Visa: ${c.postStudyWorkVisaMonths} months
+- Part-Time Work: ${c.partTimeWorkHours} hrs/week
+- Visa Difficulty: ${c.visaDifficulty}
+- Job Market Strength: ${c.meta.jobMarketStrength}
+- Tech/Field Outlook: ${c.meta.insight}
+- PR Pathway: ${c.meta.prPathwayDifficulty}`
+  )
+  .join("\n\n")}
+
+User Query: "${input.question || `Compare ${selectedCountries.map((c) => c.name).join(" vs ")} for my profile.`}"`;
+
+      const llmOutput = await callGrokChatCompletion({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.4,
+        responseFormat: { type: "json_object" }
+      });
+
+      const parsed = extractJsonFromGrokResponse<{
+        answer: string;
+        keyTakeaways: string[];
+        suggestedFollowUps: string[];
+      }>(llmOutput);
+
+      return {
+        answer: parsed.answer,
+        mode: "COUNTRY",
+        keyTakeaways: parsed.keyTakeaways ?? [
+          `Multi-country analysis generated across ${selectedCountries.length} destinations.`,
+          "All data points reflect verified living cost and visa authorization rules."
+        ],
+        suggestedFollowUps: parsed.suggestedFollowUps ?? [
+          `What are the top universities in ${selectedCountries[0].name} for my profile?`,
+          `How do visa requirements differ between ${selectedCountries[0].name} and ${selectedCountries[1]?.name ?? "others"}?`,
+          `What scholarships can help bridge the cost for ${selectedCountries[0].name}?`
+        ],
+        referencedEntities,
+        countryComparisonTable: comparisonTable,
+        disclaimer: ADVISOR_DISCLAIMER,
+        llmInfo: {
+          provider: "grok",
+          model: getGrokModelName(),
+          isLlmActive: true
+        }
+      };
+    } catch (err) {
+      console.warn("Grok LLM call failed for compareCountriesForStudent, falling back to rule-based generation:", err);
+    }
+  }
+
+  // Deterministic Fallback
   const bestBudgetCountry = [...selectedCountries].sort(
     (a, b) => a.decision.estimatedAnnualCostUsd - b.decision.estimatedAnnualCostUsd
   )[0];
@@ -344,15 +566,6 @@ ${selectedCountries
 - **Best for Career & Job Market**: **${bestJobMarketCountry.name}** offers the strongest industry demand and hiring for ${profile.fieldOfStudy}.
 - **Best for Long-Term Post-Study Work**: **${bestPswCountry.name}** grants ${bestPswCountry.postStudyWorkVisaMonths} months to secure employment.`;
 
-  const referencedEntities: AdvisorReferencedEntity[] = selectedCountries.map((c) => ({
-    type: "COUNTRY",
-    id: c.id,
-    name: c.name,
-    badge: `${c.decision.decisionScore}/100 Score`,
-    subtext: `$${c.decision.estimatedAnnualCostUsd.toLocaleString()}/yr • ${c.postStudyWorkVisaMonths}mo PSW`,
-    link: "/countries"
-  }));
-
   return {
     answer,
     mode: "COUNTRY",
@@ -370,10 +583,17 @@ ${selectedCountries
     ],
     referencedEntities,
     countryComparisonTable: comparisonTable,
-    disclaimer: ADVISOR_DISCLAIMER
+    disclaimer: ADVISOR_DISCLAIMER,
+    llmInfo: {
+      provider: "rule-based",
+      isLlmActive: false
+    }
   };
 }
 
+/**
+ * Summarizes public policies, proof of funds, and intake trends using Grok LLM.
+ */
 export async function summarizePublicInsights(
   userId: string,
   input: AdvisorInsightsInput
@@ -385,9 +605,88 @@ export async function summarizePublicInsights(
     : countryDecisions[0];
 
   const field = input.field || profile.fieldOfStudy || "Computer Science / Engineering";
-
   const allCountriesWithPrograms = countryDecisions.filter((c) => c.universityCount > 0);
 
+  const referencedEntities: AdvisorReferencedEntity[] = allCountriesWithPrograms.slice(0, 4).map((c) => ({
+    type: "COUNTRY",
+    id: c.id,
+    name: c.name,
+    badge: c.meta.academicIntake,
+    subtext: `Proof of funds: ~$${c.meta.proofOfFundsUsd.toLocaleString()}`,
+    link: "/countries"
+  }));
+
+  if (isGrokConfigured()) {
+    try {
+      const systemPrompt = `You are the StudyCompass AI International Education Strategist, powered by xAI Grok.
+Provide up-to-date, grounded public market insights on visa rules, blocked accounts/proof of funds, salary prospects, and intake windows.
+Return a structured JSON response matching this schema:
+{
+  "answer": "Markdown format with sections: 1. Tech & Industry Hiring Outlook (salaries, language advantage), 2. Country Policies & Intake Cycles table, 3. Official Visa & Policy Best Practices.",
+  "keyTakeaways": ["key point 1", "key point 2", "key point 3"],
+  "suggestedFollowUps": ["followup 1", "followup 2", "followup 3", "followup 4"]
+}`;
+
+      const userPrompt = `Provide public insights for:
+Field: ${field}
+Target Country Focus: ${targetCountry ? targetCountry.name : "Global Overview"}
+Student Nationality: ${profile.nationality}
+Student Target Degree: ${profile.targetDegree}
+
+Country Data Overview:
+${allCountriesWithPrograms
+  .slice(0, 6)
+  .map(
+    (c) =>
+      `- ${c.name}: Intakes: ${c.meta.academicIntake}, Proof of funds: ~$${c.meta.proofOfFundsUsd.toLocaleString()}, PSW: ${c.postStudyWorkVisaMonths}mo, Job Market: ${c.meta.jobMarketStrength}`
+  )
+  .join("\n")}
+
+User Question: "${input.question || `Summarize visa requirements, proof of funds, and job trends for ${field}.`}"`;
+
+      const llmOutput = await callGrokChatCompletion({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.35,
+        responseFormat: { type: "json_object" }
+      });
+
+      const parsed = extractJsonFromGrokResponse<{
+        answer: string;
+        keyTakeaways: string[];
+        suggestedFollowUps: string[];
+      }>(llmOutput);
+
+      return {
+        answer: parsed.answer,
+        mode: "INSIGHTS",
+        keyTakeaways: parsed.keyTakeaways ?? [
+          `Strong industry demand for ${field} across Western & Central Europe and North America.`,
+          "Fall intake offers the largest volume of university seats and scholarship allocations.",
+          "Proof of funds and language certifications should be organized at least 6 months before visa application."
+        ],
+        suggestedFollowUps: parsed.suggestedFollowUps ?? [
+          `What are the upcoming application deadlines for ${field}?`,
+          `How much proof of funds do I need for Germany vs France?`,
+          `Which scholarships are currently open for international applicants?`,
+          `Can I work part-time while studying?`
+        ],
+        referencedEntities,
+        disclaimer: ADVISOR_DISCLAIMER,
+        llmInfo: {
+          provider: "grok",
+          model: getGrokModelName(),
+          isLlmActive: true
+        }
+      };
+    } catch (err) {
+      console.warn("Grok LLM call failed for summarizePublicInsights, falling back to rule-based generation:", err);
+    }
+  }
+
+  // Deterministic Fallback
   const answer = `### 📊 Public Insights & Market Trends: ${field}
 ${targetCountry ? `**Focus Country**: ${targetCountry.name} (${targetCountry.meta.region})` : "**Scope**: Global & Key Study Destinations"}
 
@@ -419,15 +718,6 @@ ${allCountriesWithPrograms
 2. **Application Windows**: Fall intakes (September/October) have application deadlines between **December and April**. Spring intakes (January/February) close around **September/October**.
 3. **Scholarship Priority**: Government scholarships (e.g., DAAD, Eiffel, Erasmus Mundus) require applications 8–12 months in advance of the academic semester.`;
 
-  const referencedEntities: AdvisorReferencedEntity[] = allCountriesWithPrograms.slice(0, 4).map((c) => ({
-    type: "COUNTRY",
-    id: c.id,
-    name: c.name,
-    badge: c.meta.academicIntake,
-    subtext: `Proof of funds: ~$${c.meta.proofOfFundsUsd.toLocaleString()}`,
-    link: "/countries"
-  }));
-
   return {
     answer,
     mode: "INSIGHTS",
@@ -443,10 +733,17 @@ ${allCountriesWithPrograms
       `Can I work part-time while studying?`
     ],
     referencedEntities,
-    disclaimer: ADVISOR_DISCLAIMER
+    disclaimer: ADVISOR_DISCLAIMER,
+    llmInfo: {
+      provider: "rule-based",
+      isLlmActive: false
+    }
   };
 }
 
+/**
+ * Generates an actionable next steps roadmap using Grok LLM reasoning.
+ */
 export async function suggestNextSteps(
   userId: string,
   input: AdvisorNextStepsInput
@@ -460,11 +757,11 @@ export async function suggestNextSteps(
   const hasMatches = matches.length > 0;
   const hasStrategy = Boolean(strategyPlan);
 
-  const nextStepItems: AdvisorNextStepItem[] = [];
+  const defaultNextStepItems: AdvisorNextStepItem[] = [];
 
   // Phase 1: Academics & Tests
   if (!hasIelts) {
-    nextStepItems.push({
+    defaultNextStepItems.push({
       id: "step-test-english",
       category: "ACADEMICS_TESTS",
       title: "Complete IELTS or TOEFL English Proficiency Exam",
@@ -475,7 +772,7 @@ export async function suggestNextSteps(
       actionLabel: "Update Profile Test Scores"
     });
   } else if ((profile.ieltsScore ?? 0) < 6.5 && (profile.toeflScore ?? 0) < 85) {
-    nextStepItems.push({
+    defaultNextStepItems.push({
       id: "step-retake-english",
       category: "ACADEMICS_TESTS",
       title: "Consider Retaking IELTS/TOEFL for Higher Tier Unlocks",
@@ -488,7 +785,7 @@ export async function suggestNextSteps(
   }
 
   if (!hasGre && normalizedCgpa < 3.5) {
-    nextStepItems.push({
+    defaultNextStepItems.push({
       id: "step-gre-standardized",
       category: "ACADEMICS_TESTS",
       title: "Evaluate GRE / Standardized Test Opportunity",
@@ -502,7 +799,7 @@ export async function suggestNextSteps(
 
   // Phase 2: Application Strategy
   if (!hasMatches) {
-    nextStepItems.push({
+    defaultNextStepItems.push({
       id: "step-generate-matches",
       category: "APPLICATION_STRATEGY",
       title: "Run Smart University Matcher",
@@ -513,7 +810,7 @@ export async function suggestNextSteps(
       actionLabel: "Generate University Matches"
     });
   } else if (!hasStrategy) {
-    nextStepItems.push({
+    defaultNextStepItems.push({
       id: "step-build-strategy",
       category: "APPLICATION_STRATEGY",
       title: "Construct Balanced Application Strategy List",
@@ -524,7 +821,7 @@ export async function suggestNextSteps(
       actionLabel: "Build Application Plan"
     });
   } else {
-    nextStepItems.push({
+    defaultNextStepItems.push({
       id: "step-review-strategy",
       category: "APPLICATION_STRATEGY",
       title: "Finalize Program Applications and Track Deadlines",
@@ -537,7 +834,7 @@ export async function suggestNextSteps(
   }
 
   // Phase 3: Scholarships & Finance
-  nextStepItems.push({
+  defaultNextStepItems.push({
     id: "step-scholarship-apps",
     category: "SCHOLARSHIPS_FINANCE",
     title: "Apply to Priority Financial Aid & University Merit Waivers",
@@ -549,7 +846,7 @@ export async function suggestNextSteps(
   });
 
   // Phase 4: Documents & Visa
-  nextStepItems.push({
+  defaultNextStepItems.push({
     id: "step-doc-prep",
     category: "DOCUMENTS_VISA",
     title: "Prepare Academic Transcripts, SOP & Recommendation Letters",
@@ -560,6 +857,108 @@ export async function suggestNextSteps(
     actionLabel: "Manage Document Checklist"
   });
 
+  const referencedEntities: AdvisorReferencedEntity[] = [
+    {
+      type: "PROGRAM",
+      id: "strategy-builder",
+      name: "Application Strategy Builder",
+      badge: "Strategy Tool",
+      subtext: "Create your 3-4-2 university balance",
+      link: "/application-strategy"
+    },
+    {
+      type: "SCHOLARSHIP",
+      id: "scholarships-directory",
+      name: "Scholarships Directory",
+      badge: "Financial Aid",
+      subtext: "Explore merit & government scholarships",
+      link: "/scholarships"
+    }
+  ];
+
+  if (isGrokConfigured()) {
+    try {
+      const systemPrompt = `You are the StudyCompass AI Strategic Study Abroad Coach, powered by xAI Grok.
+Generate a prioritized, highly tailored action roadmap for the student's upcoming intake.
+Return a structured JSON response matching this schema:
+{
+  "answer": "Detailed Markdown action roadmap organized into 4 logical phases: Phase 1 (Tests & Academics), Phase 2 (University Strategy), Phase 3 (Scholarships & Financials), Phase 4 (Dossier & Submissions).",
+  "keyTakeaways": ["takeaway 1", "takeaway 2", "takeaway 3"],
+  "suggestedFollowUps": ["followup 1", "followup 2", "followup 3", "followup 4"],
+  "nextSteps": [
+    {
+      "id": "step-1",
+      "category": "ACADEMICS_TESTS",
+      "title": "Title of step",
+      "description": "Actionable description",
+      "priority": "HIGH",
+      "status": "PENDING",
+      "actionUrl": "/profile",
+      "actionLabel": "Action label"
+    }
+  ]
+}`;
+
+      const userPrompt = `Generate a personalized action roadmap for this student:
+Profile:
+- Name: ${profile.user?.name ?? "Student"} (${profile.nationality})
+- Field: ${profile.fieldOfStudy} (${profile.targetDegree})
+- Normalized GPA: ${normalizedCgpa.toFixed(2)}/4.0
+- English Score: ${profile.ieltsScore ? `IELTS ${profile.ieltsScore}` : profile.toeflScore ? `TOEFL ${profile.toeflScore}` : "None"}
+- GRE Score: ${profile.greScore ?? "None"}
+- Research Publications: ${profile.researchPapers}
+- Target Intake: ${input.targetIntake || profile.preferredIntake || "Upcoming Fall Intake"}
+- Readiness Tier: ${readinessScores[0]?.tier ?? "Mid-tier"} (Score: ${readinessScores[0]?.score ?? 70}/100)
+- Shortlisted Strategy: ${hasStrategy ? `${strategyPlan?.totalApplications} locked programs` : "No strategy plan created yet"}
+- Matches Generated: ${hasMatches ? `${matches.length} matched programs` : "None"}
+
+User Request: "${input.question || "What are my immediate priorities and roadmap to get ready for application deadlines?"}"`;
+
+      const llmOutput = await callGrokChatCompletion({
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.35,
+        responseFormat: { type: "json_object" }
+      });
+
+      const parsed = extractJsonFromGrokResponse<{
+        answer: string;
+        keyTakeaways: string[];
+        suggestedFollowUps: string[];
+        nextSteps?: AdvisorNextStepItem[];
+      }>(llmOutput);
+
+      return {
+        answer: parsed.answer,
+        mode: "NEXT_STEPS",
+        keyTakeaways: parsed.keyTakeaways ?? [
+          `${defaultNextStepItems.filter((i) => i.priority === "HIGH").length} high-priority action items identified for immediate execution.`,
+          "Completing tests and finalizing your 3-4-2 university mix minimizes application risk.",
+          "Document preparation (SOP and Recommendation Letters) typically requires 4-6 weeks."
+        ],
+        suggestedFollowUps: parsed.suggestedFollowUps ?? [
+          "How do I write a strong Statement of Purpose for Computer Science?",
+          "What documents are required for German university applications?",
+          "How can I find scholarships matching my exact GPA?",
+          "When is the best time to apply for Fall intake?"
+        ],
+        referencedEntities,
+        nextSteps: parsed.nextSteps && parsed.nextSteps.length > 0 ? parsed.nextSteps : defaultNextStepItems,
+        disclaimer: ADVISOR_DISCLAIMER,
+        llmInfo: {
+          provider: "grok",
+          model: getGrokModelName(),
+          isLlmActive: true
+        }
+      };
+    } catch (err) {
+      console.warn("Grok LLM call failed for suggestNextSteps, falling back to rule-based generation:", err);
+    }
+  }
+
+  // Deterministic Fallback
   const answer = `### 🚀 Your Personalized Study Abroad Action Roadmap
 **Target Intake**: ${input.targetIntake || profile.preferredIntake || "Upcoming Academic Year (Fall)"}  
 **Profile Standing**: GPA ${normalizedCgpa.toFixed(2)}/4.0 • ${hasIelts ? `English Verified` : "English Test Needed"} • Readiness Tier: **${readinessScores[0]?.tier ?? "Mid-tier"}**
@@ -588,7 +987,7 @@ export async function suggestNextSteps(
     answer,
     mode: "NEXT_STEPS",
     keyTakeaways: [
-      `${nextStepItems.filter((i) => i.priority === "HIGH").length} high-priority action items identified for immediate execution.`,
+      `${defaultNextStepItems.filter((i) => i.priority === "HIGH").length} high-priority action items identified for immediate execution.`,
       "Completing tests and finalizing your 3-4-2 university mix minimizes application risk.",
       "Document preparation (SOP and Recommendation Letters) typically requires 4-6 weeks."
     ],
@@ -598,29 +997,20 @@ export async function suggestNextSteps(
       "How can I find scholarships matching my exact GPA?",
       "When is the best time to apply for Fall intake?"
     ],
-    referencedEntities: [
-      {
-        type: "PROGRAM",
-        id: "strategy-builder",
-        name: "Application Strategy Builder",
-        badge: "Strategy Tool",
-        subtext: "Create your 3-4-2 university balance",
-        link: "/application-strategy"
-      },
-      {
-        type: "SCHOLARSHIP",
-        id: "scholarships-directory",
-        name: "Scholarships Directory",
-        badge: "Financial Aid",
-        subtext: "Explore merit & government scholarships",
-        link: "/scholarships"
-      }
-    ],
-    nextSteps: nextStepItems,
-    disclaimer: ADVISOR_DISCLAIMER
+    referencedEntities,
+    nextSteps: defaultNextStepItems,
+    disclaimer: ADVISOR_DISCLAIMER,
+    llmInfo: {
+      provider: "rule-based",
+      isLlmActive: false
+    }
   };
 }
 
+/**
+ * Interactive Conversational Chat with Grok LLM.
+ * Gathers conversational context, student database data, and uses Grok to generate personalized answers.
+ */
 export async function chatWithAdvisor(
   userId: string,
   input: AdvisorChatInput
@@ -648,33 +1038,19 @@ export async function chatWithAdvisor(
   }
 
   // If user asked for next steps or roadmap
-  if (
-    input.focusMode === "NEXT_STEPS" ||
-    query.includes("next step") ||
-    query.includes("roadmap") ||
-    query.includes("what should i do") ||
-    query.includes("how to prepare") ||
-    query.includes("timeline")
-  ) {
+  if (input.focusMode === "NEXT_STEPS") {
     return suggestNextSteps(userId, { question: input.question });
   }
 
   // If user asked for insights or visa rules
-  if (
-    input.focusMode === "INSIGHTS" ||
-    query.includes("visa") ||
-    query.includes("salary") ||
-    query.includes("insight") ||
-    query.includes("trend") ||
-    query.includes("intake") ||
-    query.includes("proof of fund") ||
-    query.includes("work permit")
-  ) {
+  if (input.focusMode === "INSIGHTS") {
     return summarizePublicInsights(userId, { question: input.question });
   }
 
   // Check if a specific university in DB is mentioned in freeform query
-  const { programs, profile, readinessScores, matches, countryDecisions } = await getStudentContextData(userId);
+  const context = await getStudentContextData(userId);
+  const { programs, profile, readinessScores, matches, countryDecisions, scholarships } = context;
+
   const matchedProgram = programs.find((p) => {
     const titleMatch = query.includes(p.title.toLowerCase());
     const uniMatch = query.includes(p.university.name.toLowerCase());
@@ -682,21 +1058,124 @@ export async function chatWithAdvisor(
     return titleMatch || uniMatch;
   });
 
-  if (matchedProgram) {
+  if (matchedProgram && (query.includes("why") || query.includes("fit") || query.includes("suitable") || query.includes("chance") || query.includes("review"))) {
     return explainUniversitySuitability(userId, { programId: matchedProgram.id, question: input.question });
   }
 
   // Check if multiple countries are mentioned in freeform query
   const mentionedCountries = countryDecisions.filter((c) => query.includes(c.name.toLowerCase()));
 
-  if (mentionedCountries.length >= 2) {
+  if (mentionedCountries.length >= 2 && (query.includes("compare") || query.includes("vs") || query.includes("better") || query.includes("difference"))) {
     return compareCountriesForStudent(userId, {
       countryIds: mentionedCountries.map((c) => c.id),
       question: input.question
     });
   }
 
-  // General Grounded Advisory Response
+  // Conversational Grok LLM Execution
+  if (isGrokConfigured()) {
+    try {
+      const normalizedCgpa = (profile.cgpa / profile.cgpaScale) * 4;
+      const safeCount = matches.filter((m) => m.category === "SAFE").length;
+      const targetCount = matches.filter((m) => m.category === "TARGET").length;
+      const reachCount = matches.filter((m) => m.category === "REACH").length;
+      const topReadiness = readinessScores[0];
+
+      const systemPrompt = `You are the StudyCompass AI Study Abroad Advisor, powered by xAI Grok.
+You are an empathetic, insightful, and expert educational consultant.
+You help international students evaluate universities, understand admissions requirements, plan scholarships, compare study destinations, and prepare successful applications.
+You MUST personalize your advice using the student's background data provided below.
+Return a structured JSON response matching this schema:
+{
+  "answer": "Detailed Markdown answer addressing the student's question directly, offering clear strategic analysis, practical tips, and next steps.",
+  "keyTakeaways": ["key takeaway 1", "key takeaway 2", "key takeaway 3"],
+  "suggestedFollowUps": ["suggested follow-up question 1", "suggested follow-up question 2", "suggested follow-up question 3"]
+}`;
+
+      const historyFormatted = (input.history ?? []).slice(-6).map((m) => ({
+        role: m.role,
+        content: m.content
+      }));
+
+      const contextSummary = `Student Profile:
+- Name: ${profile.user?.name ?? "Student"} (${profile.nationality})
+- Target Degree: ${profile.targetDegree} in ${profile.fieldOfStudy}
+- GPA: ${normalizedCgpa.toFixed(2)}/4.0 (${profile.cgpa}/${profile.cgpaScale})
+- English Proficiency: ${profile.ieltsScore ? `IELTS ${profile.ieltsScore}` : profile.toeflScore ? `TOEFL ${profile.toeflScore}` : "Not provided"}
+- GRE Score: ${profile.greScore ?? "None"}
+- Declared Budget: $${profile.budgetUsd.toLocaleString()} USD/year
+- Readiness Tier: ${topReadiness?.tier ?? "Mid-tier"} (Score: ${topReadiness?.score ?? 70}/100)
+- Preferred Countries: ${profile.preferredCountries.length ? profile.preferredCountries.join(", ") : "Global"}
+- Platform Matches: ${matches.length} programs (${safeCount} Safe, ${targetCount} Target, ${reachCount} Reach)
+- Available Scholarships in DB: ${scholarships.length} scholarships across ${countryDecisions.length} countries.`;
+
+      const userMessageWithContext = `${contextSummary}
+
+User Question: "${input.question}"`;
+
+      const messagesForGrok: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+        { role: "system", content: systemPrompt },
+        ...historyFormatted,
+        { role: "user", content: userMessageWithContext }
+      ];
+
+      const llmOutput = await callGrokChatCompletion({
+        messages: messagesForGrok,
+        temperature: 0.45,
+        responseFormat: { type: "json_object" }
+      });
+
+      const parsed = extractJsonFromGrokResponse<{
+        answer: string;
+        keyTakeaways: string[];
+        suggestedFollowUps: string[];
+      }>(llmOutput);
+
+      return {
+        answer: parsed.answer,
+        mode: "GENERAL",
+        keyTakeaways: parsed.keyTakeaways ?? [
+          `Evaluated for ${profile.fieldOfStudy} with a ${topReadiness?.tier ?? "Mid-tier"} profile.`,
+          `${matches.length} programs matched in platform catalog.`,
+          "Advice generated with Grok LLM grounded in student profile data."
+        ],
+        suggestedFollowUps: parsed.suggestedFollowUps ?? [
+          "Which universities are the safest options for my GPA?",
+          "Compare Germany vs France for MS in Computer Science",
+          "What are the highest-paying scholarships available for me?",
+          "Generate my next steps roadmap for Fall intake"
+        ],
+        referencedEntities: [
+          {
+            type: "PROGRAM",
+            id: "matching-page",
+            name: "Smart University Matching",
+            badge: `${matches.length} Matches`,
+            subtext: "View categorized programs",
+            link: "/matches"
+          },
+          {
+            type: "COUNTRY",
+            id: "country-decision",
+            name: "Country Decision Dashboard",
+            badge: `${countryDecisions.length} Countries`,
+            subtext: "Compare costs, visas & work rules",
+            link: "/countries"
+          }
+        ],
+        disclaimer: ADVISOR_DISCLAIMER,
+        llmInfo: {
+          provider: "grok",
+          model: getGrokModelName(),
+          isLlmActive: true
+        }
+      };
+    } catch (err) {
+      console.warn("Grok LLM call failed for chatWithAdvisor, falling back to rule-based generation:", err);
+    }
+  }
+
+  // General Grounded Advisory Fallback Response
   return generateGeneralAdvisoryResponse(input.question, profile, readinessScores, matches, countryDecisions);
 }
 
@@ -715,9 +1194,9 @@ function generateGeneralAdvisoryResponse(
       : "Not yet provided";
 
   const topReadiness = readinessScores[0];
-  const safeCount = matches.filter((m) => m.category === "SAFE").length;
-  const targetCount = matches.filter((m) => m.category === "TARGET").length;
-  const reachCount = matches.filter((m) => m.category === "REACH").length;
+  const safeCount = matches.filter((m: any) => m.category === "SAFE").length;
+  const targetCount = matches.filter((m: any) => m.category === "TARGET").length;
+  const reachCount = matches.filter((m: any) => m.category === "REACH").length;
 
   const answer = `### 💡 Personalized Advisor Guidance
 
@@ -736,7 +1215,7 @@ Hello **${profile.user?.name ?? "Student"}**! Here is an analysis of your inquir
 ---
 
 #### 2. Key Insights for Your Question
-- **Admission & Category Match**: With your current GPA and test profile, our rule-based system identifies **${safeCount} Safe**, **${targetCount} Target**, and **${reachCount} Reach** university options.
+- **Admission & Category Match**: With your current GPA and test profile, our system identifies **${safeCount} Safe**, **${targetCount} Target**, and **${reachCount} Reach** university options.
 - **Budget Alignment**: For your annual budget of $${profile.budgetUsd.toLocaleString()}, European destinations such as Germany, Poland, and Belgium offer high financial sustainability.
 - **Application Advice**: Focus on submitting applications during early admission rounds and applying for university merit waivers and national scholarships simultaneously.
 
@@ -777,7 +1256,11 @@ You can ask me to **evaluate a specific university**, **compare two countries si
         link: "/countries"
       }
     ],
-    disclaimer: ADVISOR_DISCLAIMER
+    disclaimer: ADVISOR_DISCLAIMER,
+    llmInfo: {
+      provider: "rule-based",
+      isLlmActive: false
+    }
   };
 }
 

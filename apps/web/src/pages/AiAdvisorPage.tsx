@@ -244,14 +244,14 @@ export function AiAdvisorPage() {
                 <h1 className="text-2xl font-bold text-[#141b34]">AI Study Abroad Advisor</h1>
                 <span className="inline-flex items-center gap-1 rounded-full bg-[#eee7ff] px-3 py-0.5 text-xs font-semibold text-[#6d3df4]">
                   <Sparkles className="h-3.5 w-3.5" />
-                  Profile Grounded
+                  {context?.llmInfo?.isLlmActive ? `LLM Powered by Grok (${context.llmInfo.model ?? "grok-2-latest"})` : "Profile Grounded LLM Advisor"}
                 </span>
                 <span className="rounded-full bg-emerald-50 px-3 py-0.5 text-xs font-medium text-emerald-700">
-                  Complements Rule-Based Matching
+                  RAG Grounded in Real Admissions Data
                 </span>
               </div>
               <p className="mt-1.5 text-sm leading-relaxed text-[#5a6275]">
-                Answers personalized questions using your active student profile, admission requirements, country policies, and verified platform records.
+                Combines advanced Grok large language model reasoning with your active student profile, admission requirements, scholarships, and country work visa facts.
               </p>
             </div>
           </div>
@@ -510,8 +510,9 @@ export function AiAdvisorPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="rounded-md bg-[#eee7ff] px-2.5 py-1 text-[11px] font-semibold text-[#6d3df4]">
-                AI Advisor v1.0
+              <span className="inline-flex items-center gap-1 rounded-md bg-[#eee7ff] px-2.5 py-1 text-[11px] font-semibold text-[#6d3df4]">
+                <Sparkles className="h-3 w-3" />
+                {context?.llmInfo?.isLlmActive ? `Grok LLM (${context.llmInfo.model ?? "grok-2-latest"})` : "AI Advisor"}
               </span>
             </div>
           </div>
@@ -647,6 +648,15 @@ export function AiAdvisorPage() {
                         <Copy className="h-3 w-3" />
                         <span>{copiedId === item.id ? "Copied!" : "Copy"}</span>
                       </button>
+                      {item.responseMeta?.llmInfo?.isLlmActive ? (
+                        <>
+                          <span>•</span>
+                          <span className="inline-flex items-center gap-1 rounded bg-[#eee7ff] px-1.5 py-0.5 text-[10px] font-semibold text-[#6d3df4]">
+                            <Sparkles className="h-2.5 w-2.5" />
+                            Grok LLM
+                          </span>
+                        </>
+                      ) : null}
                     </div>
                   ) : (
                     <div className="text-right text-[11px] text-[#8c94a8] pr-2">{item.timestamp}</div>
