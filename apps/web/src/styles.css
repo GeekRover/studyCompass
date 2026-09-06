@@ -1,26 +1,331 @@
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/bricolage-grotesque/opsz.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Design tokens — the single source of truth for color, used app-wide.
+ * Warm paper + ink neutrals with a sunlit amber accent — the vibe is
+ * "someone helping you get somewhere good". `--accent` is the amber;
+ * `--primary` stays ink (decisive). success/warning/danger/info carry meaning.
+ * Values are HSL channels so Tailwind opacity modifiers (bg-accent/10) work.
+ */
 :root {
-  color: #17202a;
-  background: #f6f7fb;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --background: 40 33% 97%; /* #FBF8F2 warm paper */
+  --surface: 42 45% 99%;
+  --surface-muted: 39 26% 93%; /* #F0EBE1 */
+  --border: 37 22% 86%; /* #E5DDCF warm hairline */
+  --input: 37 20% 82%;
+  --ring: 33 84% 46%;
+
+  --foreground: 28 14% 14%; /* #29241F warm near-black */
+  --muted-foreground: 30 8% 38%;
+  --subtle-foreground: 32 8% 52%;
+
+  --primary: 28 14% 14%;
+  --primary-foreground: 40 33% 97%;
+  --primary-muted: 39 26% 91%;
+
+  --accent: 33 88% 50%; /* #F09A1E sunlit amber */
+  --accent-foreground: 30 30% 12%;
+  --accent-muted: 36 92% 90%; /* pale amber wash */
+
+  --deep: 28 16% 13%;
+  --deep-foreground: 40 33% 96%;
+
+  --success: 150 52% 32%;
+  --success-muted: 148 40% 91%;
+  --warning: 27 82% 38%;
+  --warning-muted: 33 88% 90%;
+  --danger: 6 66% 48%;
+  --danger-muted: 6 74% 94%;
+  --info: 205 62% 40%;
+  --info-muted: 205 58% 92%;
+
+  --radius: 0.625rem;
 }
 
-body {
-  min-width: 320px;
-  min-height: 100vh;
-  margin: 0;
+.dark {
+  --background: 30 9% 5%; /* warm near-black */
+  --surface: 30 8% 9%;
+  --surface-muted: 30 7% 13%;
+  --border: 32 8% 20%;
+  --input: 32 8% 24%;
+  --ring: 36 90% 58%;
+
+  --foreground: 40 18% 92%;
+  --muted-foreground: 36 8% 60%;
+  --subtle-foreground: 34 7% 44%;
+
+  --primary: 40 18% 92%;
+  --primary-foreground: 30 12% 8%;
+  --primary-muted: 32 8% 15%;
+
+  --accent: 36 92% 58%;
+  --accent-foreground: 30 30% 8%;
+  --accent-muted: 34 44% 16%;
+
+  --deep: 30 10% 7%;
+  --deep-foreground: 40 18% 92%;
+
+  --success: 150 44% 52%;
+  --success-muted: 150 30% 13%;
+  --warning: 33 82% 58%;
+  --warning-muted: 33 40% 14%;
+  --danger: 6 68% 62%;
+  --danger-muted: 6 40% 16%;
+  --info: 205 62% 60%;
+  --info-muted: 205 40% 16%;
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
+/* -- Landing motion ------------------------------------------------------- */
+
+/* Hero: one orchestrated entrance, lightly staggered. */
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.landing-rise {
+  animation: landing-rise 0.7s cubic-bezier(0.22, 0.61, 0.19, 1) both;
+}
+
+.landing-rise-1 {
+  animation-delay: 0.04s;
+}
+.landing-rise-2 {
+  animation-delay: 0.14s;
+}
+.landing-rise-3 {
+  animation-delay: 0.24s;
+}
+.landing-rise-4 {
+  animation-delay: 0.34s;
+}
+
+/*
+ * Scroll reveal — elements ease up into place as they enter the viewport,
+ * once. Driven by a view() timeline (no JS). `--d` staggers a group.
+ */
+.reveal {
+  animation: reveal-rise linear both;
+  animation-timeline: view();
+  animation-range: entry 2% cover 22%;
+  animation-delay: var(--d, 0s);
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Photo reveal — a soft wipe + settle as it comes into view. */
+.reveal-img {
+  animation: reveal-img linear both;
+  animation-timeline: view();
+  animation-range: entry 0% cover 26%;
+}
+
+@keyframes reveal-img {
+  from {
+    clip-path: inset(0 0 22% 0);
+    opacity: 0.35;
+    transform: scale(1.04);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gentle parallax drift for a hero / feature photo. */
+.drift {
+  animation: drift linear both;
+  animation-timeline: view();
+  animation-range: cover 0% cover 100%;
+}
+
+@keyframes drift {
+  from {
+    transform: translateY(-3%) scale(1.06);
+  }
+  to {
+    transform: translateY(3%) scale(1.06);
+  }
+}
+
+/* "How it works" connector — draws across as the row enters view. */
+.hiw-line {
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: hiw-line linear both;
+  animation-timeline: view();
+  animation-range: entry 10% cover 30%;
+}
+
+@keyframes hiw-line {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Link underline that wipes in from the left on hover / focus. */
+.link-wipe {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size 0.25s cubic-bezier(0.22, 0.61, 0.19, 1);
+}
+.link-wipe:hover,
+.link-wipe:focus-visible {
+  background-size: 100% 1px;
+}
+
+/* FAQ answer easing open on toggle (progressive — no-op where unsupported). */
+details::details-content {
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    content-visibility 0.28s allow-discrete,
+    opacity 0.28s ease,
+    transform 0.28s ease;
+}
+details[open]::details-content {
+  opacity: 1;
+  transform: none;
+}
+
+/*
+ * Route change: the routed content is re-keyed by pathname, so this mount
+ * animation plays each time you move between pages (nav item, login, etc).
+ */
+.route-anim {
+  animation: route-in 0.36s cubic-bezier(0.16, 0.84, 0.44, 1) both;
+}
+
+@keyframes route-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Theme toggle: a circular wipe from the toggle button, revealing the new
+ * theme. The toggle adds `.theme-vt` to <html> before the transition.
+ */
+html.theme-vt::view-transition-old(root) {
+  animation: none;
+  z-index: 1;
+}
+html.theme-vt::view-transition-new(root) {
+  animation: theme-wipe 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2147483646;
+}
+@keyframes theme-wipe {
+  from {
+    clip-path: circle(0px at var(--vt-x, 50%) var(--vt-y, 0));
+  }
+  to {
+    clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 0));
+  }
+}
+
+/* Smooth in-page scrolling (anchor nav) — motion-sensitive users opt out. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-rise,
+  .reveal,
+  .reveal-img,
+  .drift,
+  .hiw-line,
+  .route-anim {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(route),
+  ::view-transition-old(route),
+  ::view-transition-new(route) {
+    animation: none !important;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    color-scheme: light dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: "Inter Variable", ui-sans-serif, system-ui, -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    font-synthesis: none;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }

@@ -1,241 +1,223 @@
-import {
-  Bell,
-  Bookmark,
-  Bot,
-  Calculator,
-  CalendarDays,
-  ChevronDown,
-  ClipboardList,
-  FileText,
-  Gauge,
-  Globe2,
-  GraduationCap,
-  LogOut,
-  MessageCircle,
-  Plane,
-  Search,
-  Settings,
-  ShieldCheck,
-  UserRound
-} from "lucide-react";
+import * as RadixDialog from "@radix-ui/react-dialog";
+import { LogOut, Menu, Settings, UserRound, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { apiRequest } from "../api/client";
+import { cn } from "../lib/cn";
 import { useAuth } from "../state/AuthContext";
 import type { ProfileResponse } from "../types";
+import { Logo } from "./Logo";
+import { navGroups, titleForPath } from "./navigation";
+import { Card } from "./ui/Card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "./ui/DropdownMenu";
+import { Progress } from "./ui/Progress";
+import { ThemeToggle } from "./ui/ThemeToggle";
 
-const navItems = [
-  {
-    label: "Dashboard",
-    to: "/",
-    icon: Gauge
-  },
-  {
-    label: "University Search",
-    to: "/matches",
-    icon: Search
-  },
-  {
-    label: "Strategy Builder",
-    to: "/application-strategy",
-    icon: ClipboardList
-  },
-  {
-    label: "Scholarships",
-    to: "/scholarships",
-    icon: GraduationCap
-  },
-  {
-    label: "Country Decision",
-    to: "/countries",
-    icon: Globe2
-  },
-  {
-    label: "Cost Calculator",
-    to: "/cost-calculator",
-    icon: Calculator
-  },
-  {
-    label: "Visa Prep Hub",
-    to: "/visa-hub",
-    icon: Plane
-  },
-  {
-    label: "Application Tracker",
-    to: "/deadlines",
-    icon: FileText
-  },
-  {
-    label: "Documents",
-    to: "/documents",
-    icon: FileText
-  },
-  {
-    label: "Deadline Monitor",
-    to: "/deadlines",
-    icon: CalendarDays
-  },
-  {
-    label: "AI Advisor",
-    to: "/advisor",
-    icon: Bot
-  },
-  {
-    label: "Saved Items",
-    to: "/saved",
-    icon: Bookmark
-  }
-];
+function initials(name?: string | null) {
+  if (!name) return "?";
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]!.toUpperCase())
+    .join("");
+}
+
+function NavItems({ onNavigate }: { onNavigate?: () => void }) {
+  return (
+    <nav className="space-y-6">
+      {navGroups.map((group) => (
+        <div key={group.heading}>
+          <p className="px-3 text-xs font-semibold uppercase tracking-wide text-foreground-subtle">
+            {group.heading}
+          </p>
+          <div className="mt-2 space-y-0.5">
+            {group.items.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                viewTransition
+                onClick={onNavigate}
+                className={({ isActive }) =>
+                  cn(
+                    "flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-primary-muted text-primary"
+                      : "text-foreground-muted hover:bg-surface-muted hover:text-foreground"
+                  )
+                }
+              >
+                <item.icon className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
+                {item.label}
+              </NavLink>
+            ))}
+          </div>
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+function ProfileCompletionCard({ completion }: { completion: number }) {
+  const done = completion >= 80;
+  return (
+    <Card className="p-4 text-center">
+      <p className="text-sm font-medium text-foreground">
+        {done ? "Your profile is almost complete" : "Complete your profile for better matches"}
+      </p>
+      <p className="mt-2 text-sm font-semibold text-primary">{completion}% complete</p>
+      <Progress value={completion} className="mt-2" />
+      <Link
+        to="/profile"
+        viewTransition
+        className="mt-4 inline-flex h-9 w-full items-center justify-center rounded-lg border border-input text-sm font-semibold text-primary hover:bg-surface-muted"
+      >
+        {done ? "Edit profile" : "Complete profile"}
+      </Link>
+    </Card>
+  );
+}
 
 export function AppLayout() {
   const { user, token, logout } = useAuth();
+  const location = useLocation();
   const [profileCompletion, setProfileCompletion] = useState(0);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = `${titleForPath(location.pathname)} · StudyCompass`;
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [location.pathname]);
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     async function loadProfileCompletion() {
       if (!token || user?.role !== "STUDENT") {
         return;
       }
-
       try {
-        const response = await apiRequest<ProfileResponse>("/student/profile", {
-          token
-        });
-        setProfileCompletion(response.completeness.complete ? 90 : Math.max(0, 90 - response.completeness.missingFields.length * 10));
+        const response = await apiRequest<ProfileResponse>("/student/profile", { token });
+        setProfileCompletion(
+          response.completeness.complete
+            ? 90
+            : Math.max(0, 90 - response.completeness.missingFields.length * 10)
+        );
       } catch {
         setProfileCompletion(0);
       }
     }
-
     loadProfileCompletion();
   }, [token, user?.role]);
 
   return (
-    <div className="min-h-screen bg-[#f6f7fb] text-[#182033]">
-      <aside className="fixed inset-y-0 left-0 z-20 hidden w-60 border-r border-[#e7eaf3] bg-white lg:flex lg:flex-col">
-        <Link to="/" className="flex h-[72px] items-center gap-3 border-b border-[#e7eaf3] px-6">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#6d3df4] text-white">
-            <GraduationCap className="h-5 w-5" strokeWidth={1.9} aria-hidden="true" />
-          </span>
-          <span>
-            <span className="block text-base font-semibold leading-5 text-[#141b34]">StudyCompass</span>
-            <span className="block text-[11px] font-medium text-[#7a8194]">Your Future, Our Guidance</span>
-          </span>
-        </Link>
-
-        <nav className="flex-1 space-y-1 px-4 py-7">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <NavLink
-                key={item.label}
-                to={item.to}
-                className={({ isActive }) => `flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium ${isActive ? "bg-[#f3efff] text-[#5f3bd7]" : "text-[#667085] hover:bg-[#f7f5ff] hover:text-[#5143b8]"}`}
-              >
-                <Icon className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
-                <span>{item.label}</span>
-              </NavLink>
-            );
-          })}
-
-          <div className="my-4 border-t border-[#edf0f6]" />
-
-          <NavLink
-            to="/profile"
-            className={({ isActive }) => `flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium ${isActive ? "bg-[#f3efff] text-[#5f3bd7]" : "text-[#667085] hover:bg-[#f7f5ff] hover:text-[#5143b8]"}`}
-          >
-            <UserRound className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
-            <span>Profile</span>
-          </NavLink>
-          <NavLink
-            to="/readiness"
-            className={({ isActive }) => `flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium ${isActive ? "bg-[#f3efff] text-[#5f3bd7]" : "text-[#667085] hover:bg-[#f7f5ff] hover:text-[#5143b8]"}`}
-          >
-            <ShieldCheck className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
-            <span>Readiness</span>
-          </NavLink>
-          <button
-            type="button"
-            className="flex h-10 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-[#667085] hover:bg-[#f7f5ff] hover:text-[#5143b8]"
-          >
-            <Settings className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
-            <span>Settings</span>
-          </button>
-          <button
-            type="button"
-            onClick={logout}
-            className="flex h-10 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-[#667085] hover:bg-[#f7f5ff] hover:text-[#5143b8]"
-          >
-            <LogOut className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
-            <span>Logout</span>
-          </button>
-        </nav>
-
-        <div className="px-5 pb-7">
-          <div className="rounded-xl border border-[#eee9fb] bg-[#fbfaff] p-5 text-center">
-            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-white text-[#6d3df4]">
-              <GraduationCap className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
-            </div>
-            <p className="text-sm font-medium text-[#2d3448]">{profileCompletion >= 80 ? "Great! Your profile is" : "Complete your profile"}</p>
-            <p className="mt-1 text-sm font-medium text-[#2d3448]">{profileCompletion >= 80 ? "almost complete" : "to get better matches"}</p>
-            <p className="mt-3 text-sm font-medium text-[#5f3bd7]">{profileCompletion}% Complete</p>
-            <div className="mt-2 h-1.5 rounded-full bg-[#ece7fb]">
-              <div className="h-full rounded-full bg-[#6d3df4]" style={{ width: `${profileCompletion}%` }} />
-            </div>
-            <Link to="/profile" className="mt-4 inline-flex h-9 w-full items-center justify-center rounded-lg border border-[#cfc7ff] bg-white text-sm font-semibold text-[#6d3df4] hover:bg-[#f7f5ff]">
-              {profileCompletion >= 80 ? "Edit Profile" : "Complete Profile"}
-            </Link>
-          </div>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Desktop sidebar */}
+      <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 flex-col border-r border-border bg-surface lg:flex">
+        <div className="flex h-16 items-center border-b border-border px-5">
+          <Logo to="/dashboard" showTagline />
         </div>
+        <div className="flex-1 overflow-y-auto px-3 py-6">
+          <NavItems />
+        </div>
+        {user?.role === "STUDENT" && (
+          <div className="p-4">
+            <ProfileCompletionCard completion={profileCompletion} />
+          </div>
+        )}
       </aside>
 
-      <div className="lg:pl-60">
-        <header className="sticky top-0 z-10 h-[72px] border-b border-[#e7eaf3] bg-white">
-          <div className="flex h-full items-center justify-between px-4 sm:px-8">
-            <Link to="/" className="flex items-center gap-2 font-semibold text-[#141b34] lg:hidden">
-              <GraduationCap className="h-5 w-5 text-[#5f3bd7]" strokeWidth={1.9} aria-hidden="true" />
-              <span>StudyCompass</span>
-            </Link>
-            <div className="hidden h-10 w-full max-w-[420px] items-center gap-2 rounded-lg border border-[#e1e5ef] bg-white px-3 lg:flex">
-              <Search className="h-4 w-4 text-[#8b92a7]" strokeWidth={1.8} aria-hidden="true" />
-              <input
-                placeholder="Search scholarships, universities..."
-                className="w-full border-0 bg-transparent text-sm text-[#344054] outline-none placeholder:text-[#98a2b3]"
-              />
-              <span className="rounded-md bg-[#f6f7fb] px-2 py-1 text-[11px] font-semibold text-[#8b92a7]">Ctrl + K</span>
-            </div>
-            <div className="flex items-center gap-5">
-              <button
-                type="button"
-                className="relative flex h-9 w-9 items-center justify-center rounded-full text-[#344054] hover:bg-[#f7f5ff]"
-                title="Notifications"
+      <div className="lg:pl-64">
+        <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-border bg-surface px-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              className="rounded-md p-2 text-foreground-muted hover:bg-surface-muted lg:hidden"
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <Logo to="/dashboard" className="lg:hidden" />
+            <h1 className="hidden text-sm font-semibold text-foreground lg:block">
+              {titleForPath(location.pathname)}
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className="flex items-center gap-2 rounded-full p-1 pr-2 hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label="Account menu"
               >
-                <Bell className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
-                <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#6d3df4]" />
-              </button>
-              <button
-                type="button"
-                className="relative hidden h-9 w-9 items-center justify-center rounded-full text-[#344054] hover:bg-[#f7f5ff] sm:flex"
-                title="Messages"
-              >
-                <MessageCircle className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
-              </button>
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#ffd4b5] text-sm font-medium text-[#703b1b]">
-                  {user?.name?.slice(0, 1) ?? "R"}
-                </div>
-                <span className="hidden text-sm font-medium text-[#2d3448] sm:inline">{user?.name ?? "Rahim Ahmed"}</span>
-                <ChevronDown className="h-4 w-4 text-[#667085]" strokeWidth={1.8} aria-hidden="true" />
-              </div>
-            </div>
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-muted text-xs font-semibold text-primary">
+                  {initials(user?.name)}
+                </span>
+                <span className="hidden text-sm font-medium text-foreground sm:inline">{user?.name}</span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" viewTransition>
+                    <UserRound className="h-4 w-4" strokeWidth={1.8} />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/readiness" viewTransition>
+                    <Settings className="h-4 w-4" strokeWidth={1.8} />
+                    Readiness
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={logout} className="text-danger">
+                  <LogOut className="h-4 w-4" strokeWidth={1.8} />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
-        <main className="px-4 py-6 sm:px-8">
-          <Outlet />
+        <main className="px-4 py-6 sm:px-6 lg:px-8">
+          <div key={location.pathname} className="route-anim">
+            <Outlet />
+          </div>
         </main>
       </div>
+
+      {/* Mobile nav sheet */}
+      <RadixDialog.Root open={mobileOpen} onOpenChange={setMobileOpen}>
+        <RadixDialog.Portal>
+          <RadixDialog.Overlay className="fixed inset-0 z-40 bg-foreground/40 backdrop-blur-sm lg:hidden" />
+          <RadixDialog.Content className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-border bg-surface p-4 focus:outline-none lg:hidden">
+            <div className="flex items-center justify-between">
+              <Logo to="/dashboard" />
+              <RadixDialog.Close
+                className="rounded-md p-2 text-foreground-muted hover:bg-surface-muted"
+                aria-label="Close menu"
+              >
+                <X className="h-5 w-5" />
+              </RadixDialog.Close>
+            </div>
+            <RadixDialog.Title className="sr-only">Navigation</RadixDialog.Title>
+            <div className="mt-6 flex-1 overflow-y-auto">
+              <NavItems onNavigate={() => setMobileOpen(false)} />
+            </div>
+          </RadixDialog.Content>
+        </RadixDialog.Portal>
+      </RadixDialog.Root>
     </div>
   );
 }

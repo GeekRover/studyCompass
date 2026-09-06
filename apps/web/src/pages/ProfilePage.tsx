@@ -18,11 +18,13 @@ import {
   Save,
   ShieldCheck,
   UserRound,
-  WalletCards
+  WalletCards,
+  X
 } from "lucide-react";
 import type { StudentProfileInput } from "@study-abroad/shared";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../api/client";
+import { PageLoader } from "../components/ui/Skeleton";
 import { useAuth } from "../state/AuthContext";
 import type { ProfileResponse } from "../types";
 
@@ -208,24 +210,28 @@ export function ProfilePage() {
   }
 
   if (loading) {
-    return <div className="text-sm font-semibold text-[#667085]">Loading profile</div>;
+    return (
+      <div className="mx-auto max-w-[1120px]">
+        <PageLoader label="Loading profile" />
+      </div>
+    );
   }
 
   if (loadError) {
     return (
-      <div className="mx-auto max-w-[760px] rounded-xl border border-red-200 bg-white p-6 text-center shadow-sm">
-        <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-red-50 text-red-600">
+      <div className="mx-auto max-w-[760px] rounded-xl border border-danger/30 bg-surface p-6 text-center shadow-sm">
+        <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-danger/10 text-danger">
           <AlertTriangle className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
         </div>
-        <h1 className="text-xl font-semibold text-[#151b2d]">Could not load your profile</h1>
-        <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#667085]">
+        <h1 className="text-xl font-semibold text-foreground">Could not load your profile</h1>
+        <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-foreground-muted">
           Your saved profile is still in the database, but the API server is not reachable right now.
         </p>
-        <p className="mt-3 text-sm font-medium text-red-700">{loadError}</p>
+        <p className="mt-3 text-sm font-medium text-danger">{loadError}</p>
         <button
           type="button"
           onClick={loadProfile}
-          className="mt-5 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#6d3df4] px-4 text-sm font-medium text-white hover:bg-[#5f35d8]"
+          className="mt-5 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-white hover:bg-primary"
         >
           <RefreshCw className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           Retry
@@ -254,11 +260,11 @@ export function ProfilePage() {
         <SummaryStep form={form} countries={countries} complete={complete} onEdit={(targetStep) => setStep(targetStep)} />
       )}
 
-      {message ? <p className="mt-4 text-center text-sm font-medium text-emerald-700">{message}</p> : null}
-      {error ? <p className="mt-4 text-center text-sm font-medium text-red-700">{error}</p> : null}
+      {message ? <p className="mt-4 text-center text-sm font-medium text-success">{message}</p> : null}
+      {error ? <p className="mt-4 text-center text-sm font-medium text-danger">{error}</p> : null}
 
-      <div className="mt-4 flex items-center justify-center gap-2 text-xs font-normal text-[#8b92a7]">
-        <ShieldCheck className="h-4 w-4 text-[#5f3bd7]" strokeWidth={1.8} aria-hidden="true" />
+      <div className="mt-4 flex items-center justify-center gap-2 text-xs font-normal text-foreground-subtle">
+        <ShieldCheck className="h-4 w-4 text-primary" strokeWidth={1.8} aria-hidden="true" />
         <span>Your information is safe and secure with us.</span>
       </div>
     </div>
@@ -281,22 +287,23 @@ function ProfileCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-xl border border-[#e6e9f2] bg-white shadow-sm">
-      <header className="flex flex-col gap-5 border-b border-[#edf0f6] px-6 py-7 lg:flex-row lg:items-center lg:justify-between">
+    <section className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
+      <header className="flex flex-col gap-5 border-b border-border px-6 py-7 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-5">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#f4f1ff] text-[#5f3bd7]"
-            title="Go back"
-          >
-            <ArrowLeft className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
-          </button>
+          {step > 1 && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary hover:bg-primary/20"
+              aria-label="Go to previous step"
+            >
+              <ArrowLeft className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
+            </button>
+          )}
           <div>
-            <h1 className="text-2xl font-semibold tracking-normal text-[#151b2d]">
-              {step} of 2&nbsp; {title}
-            </h1>
-            <p className="mt-2 text-sm font-normal text-[#667085]">{subtitle}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Step {step} of 2</p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
+            <p className="mt-2 text-sm font-normal text-foreground-muted">{subtitle}</p>
           </div>
         </div>
         <CompletionMeter value={completion} />
@@ -310,21 +317,21 @@ function CompletionMeter({ value }: { value: number }) {
   return (
     <div className="flex items-center gap-8">
       <div className="min-w-64">
-        <div className="mb-3 flex items-center justify-between text-sm font-medium text-[#667085]">
+        <div className="mb-3 flex items-center justify-between text-sm font-medium text-foreground-muted">
           <span>Profile Completion</span>
           <span>{value}%</span>
         </div>
         <div className="h-1.5 rounded-full bg-[#ece7ff]">
-          <div className="h-full rounded-full bg-[#6d3df4]" style={{ width: `${value}%` }} />
+          <div className="h-full rounded-full bg-primary" style={{ width: `${value}%` }} />
         </div>
       </div>
       <div
-        className="flex h-16 w-16 items-center justify-center rounded-full text-sm font-semibold text-[#5f3bd7]"
+        className="flex h-16 w-16 items-center justify-center rounded-full text-sm font-semibold text-primary"
         style={{
           background: `conic-gradient(#6d3df4 ${value * 3.6}deg, #ece7ff 0deg)`
         }}
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white">{value}%</div>
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface">{value}%</div>
       </div>
     </div>
   );
@@ -363,11 +370,11 @@ function AcademicStep({
       </div>
 
       <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <button type="button" onClick={onSave} disabled={saving} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#dfe4ef] bg-white px-5 text-sm font-medium text-[#344054] hover:bg-[#f8f8fb] disabled:opacity-60">
+        <button type="button" onClick={onSave} disabled={saving} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-5 text-sm font-medium text-foreground hover:bg-surface-muted disabled:opacity-60">
           <Save className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           <span>{saving ? "Saving" : "Save & Exit"}</span>
         </button>
-        <button type="button" onClick={onNext} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#6d3df4] px-6 text-sm font-medium text-white hover:bg-[#5f35d8]">
+        <button type="button" onClick={onNext} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-sm font-medium text-white hover:bg-primary">
           <span>Next: Study Preferences</span>
           <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
         </button>
@@ -409,7 +416,7 @@ function PreferencesStep({
       <Divider />
 
       <SectionTitle icon={BriefcaseBusiness} title="Work Experience" muted="Optional" />
-      <div className="mb-5 flex flex-wrap gap-8 text-sm font-medium text-[#344054]">
+      <div className="mb-5 flex flex-wrap gap-8 text-sm font-medium text-foreground">
         <Radio checked={!form.hasWorkExperience} label="No Work Experience" onChange={() => updateField("hasWorkExperience", false)} />
         <Radio checked={form.hasWorkExperience} label="I have work experience" onChange={() => updateField("hasWorkExperience", true)} />
       </div>
@@ -425,44 +432,44 @@ function PreferencesStep({
       <div className="grid gap-6 lg:grid-cols-3">
         <NumberField label="Total Budget for Study (USD)" required value={form.budgetUsd} onChange={(value) => updateField("budgetUsd", value ?? "")} hint="Total amount you can spend for tuition + living" />
         <div>
-          <div className="mb-2 text-sm font-medium text-[#344054]">Preferred Tuition Fee Range <span className="font-normal text-[#8b92a7]">(Per Year)</span></div>
+          <div className="mb-2 text-sm font-medium text-foreground">Preferred Tuition Fee Range <span className="font-normal text-foreground-subtle">(Per Year)</span></div>
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
             <NumberInput value={form.preferredTuitionMinUsd} onChange={(value) => updateField("preferredTuitionMinUsd", value ?? "")} />
-            <span className="font-normal text-[#8b92a7]">-</span>
+            <span className="font-normal text-foreground-subtle">-</span>
             <NumberInput value={form.preferredTuitionMaxUsd} onChange={(value) => updateField("preferredTuitionMaxUsd", value ?? "")} />
           </div>
-          <div className="mt-2 flex justify-between text-xs font-normal text-[#8b92a7]">
+          <div className="mt-2 flex justify-between text-xs font-normal text-foreground-subtle">
             <span>Minimum</span>
             <span>Maximum</span>
           </div>
         </div>
         <div>
-          <div className="mb-3 text-sm font-semibold text-[#344054]">Do you need Scholarship / Funding? <span className="text-red-500">*</span></div>
-          <div className="space-y-3 text-sm font-medium text-[#344054]">
+          <div className="mb-3 text-sm font-semibold text-foreground">Do you need Scholarship / Funding? <span className="text-danger">*</span></div>
+          <div className="space-y-3 text-sm font-medium text-foreground">
             <Radio checked={form.needsScholarship} label="Yes, I need scholarship" onChange={() => updateField("needsScholarship", true)} />
             <Radio checked={!form.needsScholarship} label="No, I can self-fund" onChange={() => updateField("needsScholarship", false)} />
           </div>
         </div>
       </div>
 
-      <div className="mt-8 flex items-start gap-4 rounded-lg border border-[#ece7fb] bg-[#fbfaff] px-5 py-4 text-sm font-normal leading-6 text-[#5b5574]">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#f4f1ff] text-[#5f3bd7]">
+      <div className="mt-8 flex items-start gap-4 rounded-lg border border-border bg-primary/10 px-5 py-4 text-sm font-normal leading-6 text-[#5b5574]">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
           <Info className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
         </span>
         <span>Your preferences and financial information will help us find the best universities, scholarships and countries that match your profile.</span>
       </div>
 
       <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <button type="button" onClick={onPrevious} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#dfe4ef] bg-white px-5 text-sm font-medium text-[#344054] hover:bg-[#f8f8fb]">
+        <button type="button" onClick={onPrevious} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-5 text-sm font-medium text-foreground hover:bg-surface-muted">
           <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           <span>Previous</span>
         </button>
         <div className="flex flex-col gap-3 sm:flex-row">
-          <button type="button" onClick={onSave} disabled={saving} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#dfe4ef] bg-white px-5 text-sm font-medium text-[#344054] hover:bg-[#f8f8fb] disabled:opacity-60">
+          <button type="button" onClick={onSave} disabled={saving} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-5 text-sm font-medium text-foreground hover:bg-surface-muted disabled:opacity-60">
             <Save className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
             <span>{saving ? "Saving" : "Save & Exit"}</span>
           </button>
-          <button type="button" onClick={onComplete} disabled={saving} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#6d3df4] px-6 text-sm font-medium text-white hover:bg-[#5f35d8] disabled:opacity-60">
+          <button type="button" onClick={onComplete} disabled={saving} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-sm font-medium text-white hover:bg-primary disabled:opacity-60">
             <span>{saving ? "Saving" : "Complete Profile"}</span>
             <Check className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           </button>
@@ -485,18 +492,18 @@ function SummaryStep({
 }) {
   return (
     <div>
-      <section className="mb-5 rounded-xl border border-[#e6e9f2] bg-white p-6 shadow-sm">
+      <section className="mb-5 rounded-xl border border-border bg-surface p-6 shadow-sm">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-5">
-            <button type="button" onClick={() => onEdit(2)} className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#f4f1ff] text-[#5f3bd7]">
+            <button type="button" onClick={() => onEdit(2)} className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <ArrowLeft className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
             </button>
             <div>
-              <h1 className="text-2xl font-semibold text-[#151b2d]">Profile Summary</h1>
-              <p className="mt-2 text-sm font-normal text-[#667085]">Review your information before saving your profile</p>
+              <h1 className="font-display text-2xl font-[560] tracking-[-0.01em] text-foreground">Profile Summary</h1>
+              <p className="mt-2 text-sm font-normal text-foreground-muted">Review your information before saving your profile</p>
             </div>
           </div>
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-medium text-emerald-700">
+          <div className="rounded-lg border border-success/30 bg-success/10 px-5 py-4 text-sm font-medium text-success">
             <div className="flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 shrink-0" aria-hidden="true" />
               <span><strong>Great!</strong> Your profile is {complete ? "100%" : "almost"} complete.</span>
@@ -506,7 +513,7 @@ function SummaryStep({
       </section>
 
       <div className="grid gap-5 xl:grid-cols-[1.6fr_1fr]">
-        <section className="rounded-xl border border-[#e6e9f2] bg-white p-6 shadow-sm">
+        <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
           <SummaryHeader title="Your Profile Summary" subtitle="Please review your information" icon={UserRound} onEdit={() => onEdit(1)} />
           <SummaryBlock title="Academic Information" icon={GraduationCap} onEdit={() => onEdit(1)} items={[
             ["Education Level", form.currentDegree ?? "-"],
@@ -540,13 +547,13 @@ function SummaryStep({
             ["Preferred Tuition Fee Range", `USD ${formatNumber(toNumber(form.preferredTuitionMinUsd))} - USD ${formatNumber(toNumber(form.preferredTuitionMaxUsd))}`],
             ["Scholarship / Funding", form.needsScholarship ? "Yes, I need scholarship" : "No, I can self-fund"]
           ]} />
-          <div className="mt-5 flex items-start gap-3 rounded-lg border border-[#ece7fb] bg-[#fbfaff] px-5 py-4 text-sm font-normal leading-6 text-[#5b5574]">
-            <ShieldCheck className="h-5 w-5 shrink-0 text-[#5f3bd7]" strokeWidth={1.8} aria-hidden="true" />
+          <div className="mt-5 flex items-start gap-3 rounded-lg border border-border bg-primary/10 px-5 py-4 text-sm font-normal leading-6 text-[#5b5574]">
+            <ShieldCheck className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.8} aria-hidden="true" />
             <span>Your information is secure and helps us provide the most relevant universities, scholarships and recommendations for you.</span>
           </div>
         </section>
 
-        <aside className="space-y-5 rounded-xl border border-[#e6e9f2] bg-white p-6 shadow-sm">
+        <aside className="space-y-5 rounded-xl border border-border bg-surface p-6 shadow-sm">
           <SummaryHeader title="Profile Analytics" icon={BarChart3} />
           <Metric icon={CheckCircle2} label="Profile Completion" value="100%" tone="green" detail="Excellent! You've completed all sections." />
           <Metric icon={GraduationCap} label="Target Degree" value={form.targetDegree.replace(" Degree", "")} tone="purple" />
@@ -556,9 +563,9 @@ function SummaryStep({
           <Metric icon={Calendar} label="Preferred Intake" value={(form.preferredIntake ?? "Fall 2027").split(" (")[0]} tone="cyan" />
           <Metric icon={FileCheck2} label="Career Goal" value={form.careerGoal ?? "-"} tone="yellow" />
 
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5 text-sm font-medium text-emerald-800">
+          <div className="rounded-lg border border-success/30 bg-success/10 p-5 text-sm font-medium text-success">
             <div className="flex gap-3">
-              <CheckCircle2 className="h-6 w-6 shrink-0 text-emerald-600" strokeWidth={1.8} aria-hidden="true" />
+              <CheckCircle2 className="h-6 w-6 shrink-0 text-success" strokeWidth={1.8} aria-hidden="true" />
               <div>
                 <p className="font-semibold">Profile Saved Successfully!</p>
                 <p className="mt-1 leading-5">Your profile is ready to help you find the best opportunities.</p>
@@ -567,7 +574,7 @@ function SummaryStep({
           </div>
 
           <div>
-            <p className="mb-3 text-sm font-semibold text-[#667085]">What would you like to do next?</p>
+            <p className="mb-3 text-sm font-semibold text-foreground-muted">What would you like to do next?</p>
             <div className="space-y-3">
               <ActionLink to="/matches" label="Find Universities" primary />
               <ActionLink to="/scholarships" label="Find Scholarships" />
@@ -590,10 +597,10 @@ type StepProps = {
 function SectionTitle({ icon: Icon, title, muted }: { icon: React.ElementType; title: string; muted?: string }) {
   return (
     <div className="mb-6 flex items-center gap-3">
-      <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#f4f1ff] text-[#5f3bd7]">
+      <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary">
         <Icon className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
       </span>
-      <h2 className="text-base font-semibold text-[#151b2d]">{title} {muted ? <span className="font-normal text-[#8b92a7]">({muted})</span> : null}</h2>
+      <h2 className="text-base font-semibold text-foreground">{title} {muted ? <span className="font-normal text-foreground-subtle">({muted})</span> : null}</h2>
     </div>
   );
 }
@@ -624,7 +631,7 @@ function NumberField({ label, value, onChange, step, required, hint }: { label: 
     <label className="block">
       <FieldLabel label={label} required={required} />
       <NumberInput value={value} onChange={onChange} step={step} />
-      {hint ? <p className="mt-2 text-xs font-normal text-[#8b92a7]">{hint}</p> : null}
+      {hint ? <p className="mt-2 text-xs font-normal text-foreground-subtle">{hint}</p> : null}
     </label>
   );
 }
@@ -636,7 +643,7 @@ function ScoreField({ label, value, onChange, step, optional }: { label: string;
         <FieldLabel label={label} optional={optional} info />
         <NumberInput value={value} onChange={onChange} step={step} />
       </label>
-      <button type="button" className="mt-3 text-sm font-medium text-[#5f3bd7]">Not taken yet?</button>
+      <button type="button" className="mt-3 text-sm font-medium text-primary">Not taken yet?</button>
     </div>
   );
 }
@@ -655,24 +662,43 @@ function NumberInput({ value, onChange, step }: { value: string | number | null;
 
 function FieldLabel({ label, required, optional, info }: { label: string; required?: boolean; optional?: boolean; info?: boolean }) {
   return (
-    <span className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#344054]">
-      <span>{label} {required ? <span className="text-red-500">*</span> : null} {optional ? <span className="font-normal text-[#8b92a7]">(Optional)</span> : null}</span>
-      {info ? <Info className="h-4 w-4 text-[#98a2b3]" aria-hidden="true" /> : null}
+    <span className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+      <span>{label} {required ? <span className="text-danger">*</span> : null} {optional ? <span className="font-normal text-foreground-subtle">(Optional)</span> : null}</span>
+      {info ? <Info className="h-4 w-4 text-foreground-subtle" aria-hidden="true" /> : null}
     </span>
   );
 }
 
 function CountryField({ countries, value, onChange }: { countries: string[]; value: string; onChange: (value: string) => void }) {
+  function removeCountry(target: string) {
+    onChange(countries.filter((country) => country !== target).join(", "));
+  }
+
   return (
     <label className="block">
       <FieldLabel label="Preferred Countries" required />
-      <div className="flex min-h-11 flex-wrap items-center gap-2 rounded-lg border border-[#dfe4ef] bg-white px-3 py-2 focus-within:border-[#5f3bd7]">
+      <div className="flex min-h-11 flex-wrap items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 focus-within:border-primary">
         {countries.map((country) => (
-          <span key={country} className="rounded-md bg-[#f2efff] px-3 py-1 text-sm font-medium text-[#5f3bd7]">{country} x</span>
+          <span key={country} className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-sm font-medium text-primary">
+            {country}
+            <button
+              type="button"
+              onClick={() => removeCountry(country)}
+              className="rounded-sm hover:bg-primary/20"
+              aria-label={`Remove ${country}`}
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </span>
         ))}
-        <input value={value} onChange={(event) => onChange(event.target.value)} className="min-w-52 flex-1 border-0 bg-transparent text-sm font-normal outline-none" />
+        <input
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="min-w-52 flex-1 border-0 bg-transparent text-sm font-normal outline-none"
+          placeholder={countries.length ? "" : "e.g. Canada, Germany, Australia"}
+        />
       </div>
-      <p className="mt-2 text-xs font-normal text-[#8b92a7]">Select the countries you are most interested in</p>
+      <p className="mt-2 text-xs font-normal text-foreground-subtle">Comma-separate the countries you're most interested in.</p>
     </label>
   );
 }
@@ -690,28 +716,28 @@ function SummaryHeader({ title, subtitle, icon: Icon, onEdit }: { title: string;
   return (
     <div className="mb-5 flex items-start justify-between gap-4">
       <div className="flex items-center gap-3">
-        <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#f4f1ff] text-[#5f3bd7]">
+        <span className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 text-primary">
           <Icon className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
         </span>
         <div>
-          <h2 className="text-lg font-semibold text-[#151b2d]">{title}</h2>
-          {subtitle ? <p className="mt-1 text-sm font-normal text-[#667085]">{subtitle}</p> : null}
+          <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+          {subtitle ? <p className="mt-1 text-sm font-normal text-foreground-muted">{subtitle}</p> : null}
         </div>
       </div>
-      {onEdit ? <button type="button" onClick={onEdit} className="inline-flex items-center gap-2 text-sm font-medium text-[#5f3bd7]">Edit <Edit3 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" /></button> : null}
+      {onEdit ? <button type="button" onClick={onEdit} className="inline-flex items-center gap-2 text-sm font-medium text-primary">Edit <Edit3 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" /></button> : null}
     </div>
   );
 }
 
 function SummaryBlock({ title, icon, items, onEdit }: { title: string; icon: React.ElementType; items: Array<[string, string]>; onEdit: () => void }) {
   return (
-    <section className="border-t border-[#edf0f6] py-5">
+    <section className="border-t border-border py-5">
       <SummaryHeader title={title} icon={icon} onEdit={onEdit} />
       <dl className="grid gap-x-10 gap-y-5 md:grid-cols-3">
         {items.map(([label, value]) => (
           <div key={label}>
-            <dt className="text-xs font-medium text-[#667085]">{label}</dt>
-            <dd className="mt-1 text-sm font-medium text-[#27314f]">{value}</dd>
+            <dt className="text-xs font-medium text-foreground-muted">{label}</dt>
+            <dd className="mt-1 text-sm font-medium text-foreground">{value}</dd>
           </div>
         ))}
       </dl>
@@ -721,24 +747,24 @@ function SummaryBlock({ title, icon, items, onEdit }: { title: string; icon: Rea
 
 function Metric({ icon: Icon, label, value, detail, tone }: { icon: React.ElementType; label: string; value: string; detail?: string; tone: "green" | "purple" | "blue" | "orange" | "pink" | "cyan" | "yellow" }) {
   const tones = {
-    green: "bg-emerald-50 text-emerald-600",
-    purple: "bg-[#f4f1ff] text-[#5f3bd7]",
-    blue: "bg-blue-50 text-blue-600",
-    orange: "bg-orange-50 text-orange-500",
+    green: "bg-success/10 text-success",
+    purple: "bg-primary/10 text-primary",
+    blue: "bg-info/10 text-info",
+    orange: "bg-warning/10 text-orange-500",
     pink: "bg-pink-50 text-pink-500",
     cyan: "bg-cyan-50 text-cyan-500",
-    yellow: "bg-yellow-50 text-yellow-500"
+    yellow: "bg-warning/10 text-yellow-500"
   };
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg border border-[#edf0f6] p-4">
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-4">
       <div className="flex items-center gap-4">
         <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${tones[tone]}`}>
           <Icon className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
         </span>
         <div>
-          <p className="text-sm font-medium text-[#344054]">{label}</p>
-          {detail ? <p className="mt-1 text-xs font-normal text-[#667085]">{detail}</p> : null}
+          <p className="text-sm font-medium text-foreground">{label}</p>
+          {detail ? <p className="mt-1 text-xs font-normal text-foreground-muted">{detail}</p> : null}
         </div>
       </div>
       <p className={`text-lg font-semibold ${tones[tone].split(" ").at(-1)}`}>{value}</p>
@@ -748,7 +774,7 @@ function Metric({ icon: Icon, label, value, detail, tone }: { icon: React.Elemen
 
 function ActionLink({ to, label, primary }: { to: string; label: string; primary?: boolean }) {
   return (
-    <Link to={to} className={`flex h-11 items-center justify-between rounded-lg px-4 text-sm font-medium ${primary ? "bg-[#6d3df4] text-white" : "border border-[#dfe4ef] bg-white text-[#344054]"}`}>
+    <Link to={to} className={`flex h-11 items-center justify-between rounded-lg px-4 text-sm font-medium ${primary ? "bg-primary text-white" : "border border-border bg-surface text-foreground"}`}>
       <span>{label}</span>
       <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
     </Link>
@@ -756,7 +782,7 @@ function ActionLink({ to, label, primary }: { to: string; label: string; primary
 }
 
 function Divider() {
-  return <div className="my-8 border-t border-[#edf0f6]" />;
+  return <div className="my-8 border-t border-border" />;
 }
 
 function GlobeLikeIcon(props: React.ComponentProps<typeof Landmark>) {
@@ -880,4 +906,4 @@ function experienceMonths(label: string) {
   return 0;
 }
 
-const inputClassName = "h-11 w-full rounded-lg border border-[#dfe4ef] bg-white px-4 text-sm font-normal text-[#344054] outline-none transition focus:border-[#5f3bd7] focus:ring-2 focus:ring-[#5f3bd7]/10";
+const inputClassName = "h-11 w-full rounded-lg border border-border bg-surface px-4 text-sm font-normal text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/10";

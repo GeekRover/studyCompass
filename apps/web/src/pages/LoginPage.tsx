@@ -1,31 +1,33 @@
 import { FormEvent, useState } from "react";
-import { LogIn } from "lucide-react";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
+import { AuthLayout, AuthLink } from "../components/AuthLayout";
+import { Alert } from "../components/ui/Alert";
+import { Button } from "../components/ui/Button";
+import { Field } from "../components/ui/Field";
+import { Input } from "../components/ui/Input";
+import { PasswordInput } from "../components/ui/PasswordInput";
 import { useAuth } from "../state/AuthContext";
+
+const demoCredentials = { email: "student@example.com", password: "Student@123" };
 
 export function LoginPage() {
   const { login, user } = useAuth();
   const location = useLocation();
-  const [email, setEmail] = useState("student@example.com");
-  const [password, setPassword] = useState("Student@123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   if (user) {
-    const destination = (location.state as { from?: Location } | null)?.from?.pathname ?? "/";
+    const destination = (location.state as { from?: Location } | null)?.from?.pathname ?? "/dashboard";
     return <Navigate to={destination} replace />;
   }
 
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault();
+  async function submit(credentials: { email: string; password: string }) {
     setError("");
     setSubmitting(true);
-
     try {
-      await login({
-        email,
-        password
-      });
+      await login(credentials);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Login failed");
     } finally {
@@ -33,61 +35,53 @@ export function LoginPage() {
     }
   }
 
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    submit({ email, password });
+  }
+
   return (
-    <AuthShell title="Welcome back" subtitle="Sign in to continue your study abroad planning.">
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Sign in to continue planning your study abroad journey."
+      footer={<>Need an account? <AuthLink to="/register" viewTransition>Create one</AuthLink></>}
+    >
       <form onSubmit={handleSubmit} className="space-y-4">
+        {error && <Alert tone="danger">{error}</Alert>}
         <Field label="Email">
-          <input
+          <Input
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="w-full rounded-md border border-stone-300 px-3 py-2 outline-none focus:border-moss"
             type="email"
             autoComplete="email"
+            required
           />
         </Field>
         <Field label="Password">
-          <input
+          <PasswordInput
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="w-full rounded-md border border-stone-300 px-3 py-2 outline-none focus:border-moss"
-            type="password"
             autoComplete="current-password"
+            required
           />
         </Field>
-        {error ? <p className="text-sm text-red-700">{error}</p> : null}
-        <button
-          type="submit"
+        <Button type="submit" className="w-full" loading={submitting}>
+          Sign in
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
           disabled={submitting}
-          className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-moss px-4 font-semibold text-white hover:bg-[#275c4e] disabled:opacity-60"
+          onClick={() => {
+            setEmail(demoCredentials.email);
+            setPassword(demoCredentials.password);
+            submit(demoCredentials);
+          }}
         >
-          <LogIn className="h-4 w-4" aria-hidden="true" />
-          <span>{submitting ? "Signing in" : "Sign in"}</span>
-        </button>
-        <p className="text-center text-sm text-slate-600">
-          Need an account? <Link className="font-semibold text-moss" to="/register">Register</Link>
-        </p>
+          Try the demo account
+        </Button>
       </form>
-    </AuthShell>
-  );
-}
-
-function AuthShell({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f7f5ef] px-4 py-10">
-      <section className="w-full max-w-md rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-ink">{title}</h1>
-        <p className="mt-2 text-sm text-slate-600">{subtitle}</p>
-        <div className="mt-6">{children}</div>
-      </section>
-    </main>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="mb-1 block text-sm font-medium text-slate-700">{label}</span>
-      {children}
-    </label>
+    </AuthLayout>
   );
 }

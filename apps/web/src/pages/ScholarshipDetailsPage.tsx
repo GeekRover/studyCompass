@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { apiRequest } from "../api/client";
+import { PageLoader } from "../components/ui/Skeleton";
 import { useAuth } from "../state/AuthContext";
 import type { ProfileResponse, Scholarship, ScholarshipDetailResponse } from "../types";
 
@@ -135,12 +136,12 @@ export function ScholarshipDetailsPage() {
   }
 
   if (loading) {
-    return <div className="text-sm font-medium text-[#667085]">Loading scholarship details</div>;
+    return <div className="mx-auto max-w-5xl"><PageLoader label="Loading scholarship details" /></div>;
   }
 
   if (!detail || !scholarship) {
     return (
-      <div className="mx-auto max-w-[920px] rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">
+      <div className="mx-auto max-w-[920px] rounded-xl border border-danger/30 bg-danger/10 p-5 text-sm text-danger">
         {error || "Scholarship not found"}
       </div>
     );
@@ -149,21 +150,21 @@ export function ScholarshipDetailsPage() {
   return (
     <div className="mx-auto max-w-[1240px]">
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <Link to="/scholarships" className="inline-flex items-center gap-2 text-sm font-semibold text-[#6d3df4]">
+        <Link to="/scholarships" className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
           <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           Back to Results
         </Link>
         <div className="flex flex-wrap gap-3">
-          <button type="button" onClick={saveScholarship} disabled={saving || scholarship.isSaved} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#dfe4ef] bg-white px-4 text-sm font-semibold text-[#344054] hover:bg-[#f8f8fb] disabled:opacity-60">
+          <button type="button" onClick={saveScholarship} disabled={saving || scholarship.isSaved} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 text-sm font-semibold text-foreground hover:bg-surface-muted disabled:opacity-60">
             <Bookmark className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
             {scholarship.isSaved ? "Saved Scholarship" : saving ? "Saving" : "Save Scholarship"}
           </button>
-          <button type="button" onClick={addDeadline} disabled={addingDeadline || scholarship.deadlineTracked || !scholarship.deadline} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#dfe4ef] bg-white px-4 text-sm font-semibold text-[#344054] hover:bg-[#f8f8fb] disabled:opacity-60">
+          <button type="button" onClick={addDeadline} disabled={addingDeadline || scholarship.deadlineTracked || !scholarship.deadline} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 text-sm font-semibold text-foreground hover:bg-surface-muted disabled:opacity-60">
             <CalendarPlus className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
             {scholarship.deadlineTracked ? "Tracker Added" : addingDeadline ? "Adding" : "Add to Tracker"}
           </button>
           {scholarship.sourceUrl ? (
-            <a href={scholarship.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#6d3df4] px-4 text-sm font-semibold text-white hover:bg-[#5f35d8]">
+            <a href={scholarship.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-white hover:bg-primary">
               Apply Now
               <ExternalLink className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
             </a>
@@ -171,26 +172,26 @@ export function ScholarshipDetailsPage() {
         </div>
       </div>
 
-      {message ? <div className="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-700">{message}</div> : null}
+      {message ? <div className="mb-5 rounded-lg border border-success/30 bg-success/10 p-4 text-sm font-medium text-success">{message}</div> : null}
       {error ? <ErrorNotice message={error} /> : null}
 
-      <section className="mb-5 rounded-xl border border-[#e6e9f2] bg-white p-5 shadow-sm">
+      <section className="mb-5 rounded-xl border border-border bg-surface p-5 shadow-sm">
         <div className="grid gap-5 lg:grid-cols-[1fr_160px]">
           <div className="flex min-w-0 gap-4">
             <ScholarshipLogo scholarship={scholarship} />
             <div className="min-w-0">
               <div className="mb-2 flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-semibold text-[#151b2d]">{scholarship.name}</h1>
+                <h1 className="font-display text-2xl font-[560] tracking-[-0.01em] text-foreground">{scholarship.name}</h1>
                 <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusTone(status)}`}>{formatStatus(status)}</span>
               </div>
-              <p className="text-sm font-medium text-[#667085]">
+              <p className="text-sm font-medium text-foreground-muted">
                 {scholarship.university?.name ?? getScholarshipProvider(scholarship)} / {scholarship.country?.name ?? "Multiple countries"} / {scholarship.degreeLevel}
               </p>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#344054]">{buildScholarshipDescription(scholarship)}</p>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-foreground">{buildScholarshipDescription(scholarship)}</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">{scholarship.amountUsd ? `USD ${formatNumber(scholarship.amountUsd)}` : "Funding"}</span>
-                <span className="rounded-md bg-[#f4f1ff] px-2.5 py-1 text-xs font-semibold text-[#6d3df4]">{scholarship.coverageType}</span>
-                <span className="rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">For International Students</span>
+                <span className="rounded-md bg-success/10 px-2.5 py-1 text-xs font-semibold text-success">{scholarship.amountUsd ? `USD ${formatNumber(scholarship.amountUsd)}` : "Funding"}</span>
+                <span className="rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">{scholarship.coverageType}</span>
+                <span className="rounded-md bg-info/10 px-2.5 py-1 text-xs font-semibold text-info">For International Students</span>
               </div>
               <div className="mt-5 grid gap-3 text-xs sm:grid-cols-4">
                 <MiniMeta icon={CalendarDays} label="Deadline" value={formatDate(scholarship.deadline)} tone="red" />
@@ -203,14 +204,14 @@ export function ScholarshipDetailsPage() {
 
           <div className="flex flex-col items-start justify-center lg:items-center">
             <ScoreRing value={score} status={status} size="large" />
-            <p className="mt-2 text-sm font-semibold text-[#344054]">Match Score</p>
+            <p className="mt-2 text-sm font-semibold text-foreground">Match Score</p>
             <span className={`mt-2 rounded-md px-3 py-1 text-xs font-semibold ${getStatusTone(status)}`}>{formatStatus(status)}</span>
           </div>
         </div>
 
-        <nav className="mt-5 flex gap-2 overflow-x-auto border-t border-[#edf0f6] pt-4">
+        <nav className="mt-5 flex gap-2 overflow-x-auto border-t border-border pt-4">
           {tabs.map((tab) => (
-            <button key={tab} type="button" onClick={() => setActiveTab(tab)} className={`shrink-0 rounded-lg px-3 py-2 text-sm font-semibold ${activeTab === tab ? "bg-[#f4f1ff] text-[#6d3df4]" : "text-[#667085] hover:bg-[#f8f8fb]"}`}>
+            <button key={tab} type="button" onClick={() => setActiveTab(tab)} className={`shrink-0 rounded-lg px-3 py-2 text-sm font-semibold ${activeTab === tab ? "bg-primary/10 text-primary" : "text-foreground-muted hover:bg-surface-muted"}`}>
               {tab}
             </button>
           ))}
@@ -221,11 +222,11 @@ export function ScholarshipDetailsPage() {
         <div className="space-y-5">
           <section className="grid gap-5 lg:grid-cols-[1fr_0.75fr]">
             <InfoCard icon={Info} title="About the Scholarship">
-              <p className="text-sm leading-6 text-[#344054]">{buildScholarshipDescription(scholarship)}</p>
+              <p className="text-sm leading-6 text-foreground">{buildScholarshipDescription(scholarship)}</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <span className="rounded-md bg-[#f4f1ff] px-2.5 py-1 text-xs font-semibold text-[#6d3df4]">Merit Based</span>
-                <span className="rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">For International Students</span>
-                <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Developing Countries</span>
+                <span className="rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">Merit Based</span>
+                <span className="rounded-md bg-info/10 px-2.5 py-1 text-xs font-semibold text-info">For International Students</span>
+                <span className="rounded-md bg-success/10 px-2.5 py-1 text-xs font-semibold text-success">Developing Countries</span>
               </div>
             </InfoCard>
 
@@ -234,7 +235,7 @@ export function ScholarshipDetailsPage() {
               <DateRow label="Application Deadline" value={formatDate(scholarship.deadline)} urgent />
               <DateRow label="Result Announcement" value="31 Mar 2027" />
               <DateRow label="Program Start" value="Sep 2027" />
-              <button type="button" onClick={addDeadline} disabled={addingDeadline || scholarship.deadlineTracked || !scholarship.deadline} className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] text-sm font-semibold text-[#6d3df4] hover:bg-[#f4f1ff] disabled:opacity-60">
+              <button type="button" onClick={addDeadline} disabled={addingDeadline || scholarship.deadlineTracked || !scholarship.deadline} className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] text-sm font-semibold text-primary hover:bg-primary/10 disabled:opacity-60">
                 <CalendarPlus className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
                 Add all to Deadline Tracker
               </button>
@@ -244,21 +245,21 @@ export function ScholarshipDetailsPage() {
           <section className="grid gap-5 lg:grid-cols-2">
             <InfoCard icon={ShieldCheck} title="Coverage & Benefits">
               <BenefitList scholarship={scholarship} />
-              <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700">
+              <p className="mt-4 rounded-lg bg-success/10 px-3 py-2 text-sm font-medium text-success">
                 This is a {scholarship.coverageType.toLowerCase()} scholarship. Living expenses may depend on final award terms.
               </p>
             </InfoCard>
 
             <InfoCard icon={FileText} title="Required Documents">
-              <ul className="grid gap-2 text-sm leading-6 text-[#344054] sm:grid-cols-2">
+              <ul className="grid gap-2 text-sm leading-6 text-foreground sm:grid-cols-2">
                 {getDocuments(scholarship).map((document) => (
                   <li key={document} className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#6d3df4]" />
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                     {document}
                   </li>
                 ))}
               </ul>
-              <button type="button" className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] text-sm font-semibold text-[#6d3df4] hover:bg-[#f4f1ff]">
+              <button type="button" className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] text-sm font-semibold text-primary hover:bg-primary/10">
                 View Full Document List
                 <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </button>
@@ -266,16 +267,16 @@ export function ScholarshipDetailsPage() {
           </section>
 
           <InfoCard icon={ListChecks} title="How to Apply">
-            <div className="grid gap-3 text-sm leading-6 text-[#344054] md:grid-cols-2">
+            <div className="grid gap-3 text-sm leading-6 text-foreground md:grid-cols-2">
               {["Check eligibility and prepare documents", "Apply for the master's program", "Submit scholarship materials before the deadline", "Track result updates from the official page"].map((step, index) => (
-                <div key={step} className="flex gap-3 rounded-lg bg-[#f8f9fc] px-3 py-2">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#6d3df4] text-xs font-semibold text-white">{index + 1}</span>
+                <div key={step} className="flex gap-3 rounded-lg bg-surface-muted px-3 py-2">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">{index + 1}</span>
                   {step}
                 </div>
               ))}
             </div>
             {scholarship.sourceUrl ? (
-              <a href={scholarship.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] px-5 text-sm font-semibold text-[#6d3df4] hover:bg-[#f4f1ff]">
+              <a href={scholarship.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] px-5 text-sm font-semibold text-primary hover:bg-primary/10">
                 View Official Page
                 <ExternalLink className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </a>
@@ -284,11 +285,11 @@ export function ScholarshipDetailsPage() {
         </div>
 
         <aside className="space-y-5">
-          <section className="rounded-xl border border-[#e6e9f2] bg-white p-5 shadow-sm">
+          <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-emerald-600" strokeWidth={1.8} aria-hidden="true" />
-                <h2 className="text-base font-semibold text-[#151b2d]">Your Eligibility Summary</h2>
+                <ShieldCheck className="h-5 w-5 text-success" strokeWidth={1.8} aria-hidden="true" />
+                <h2 className="text-base font-semibold text-foreground">Your Eligibility Summary</h2>
               </div>
               <span className={`rounded-md px-2.5 py-1 text-xs font-semibold ${getStatusTone(status)}`}>{formatStatus(status)}</span>
             </div>
@@ -297,21 +298,21 @@ export function ScholarshipDetailsPage() {
                 <EligibilityRow key={item.label} item={item} />
               ))}
             </div>
-            <div className="mt-5 flex items-center justify-between border-t border-[#edf0f6] pt-4">
-              <span className="text-sm font-semibold text-[#344054]">Overall Match Score</span>
-              <span className="text-lg font-semibold text-emerald-700">{score}%</span>
+            <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
+              <span className="text-sm font-semibold text-foreground">Overall Match Score</span>
+              <span className="text-lg font-semibold text-success">{score}%</span>
             </div>
           </section>
 
-          <section className="rounded-xl border border-amber-100 bg-amber-50 p-5">
-            <div className="mb-4 flex items-center gap-2 text-amber-800">
+          <section className="rounded-xl border border-warning/30 bg-warning/10 p-5">
+            <div className="mb-4 flex items-center gap-2 text-warning">
               <Star className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
               <h2 className="text-base font-semibold">Why you are a good match</h2>
             </div>
-            <ul className="space-y-3 text-sm leading-6 text-[#344054]">
+            <ul className="space-y-3 text-sm leading-6 text-foreground">
               {(match?.reasons ?? ["Your profile matches the stored eligibility rules."]).slice(0, 5).map((reason) => (
                 <li key={reason} className="flex gap-2">
-                  <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={1.8} aria-hidden="true" />
+                  <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-success" strokeWidth={1.8} aria-hidden="true" />
                   {reason}
                 </li>
               ))}
@@ -319,14 +320,14 @@ export function ScholarshipDetailsPage() {
           </section>
 
           <section className="rounded-xl border border-[#eadfff] bg-[#fbf9ff] p-5">
-            <div className="mb-4 flex items-center gap-2 text-[#6d3df4]">
+            <div className="mb-4 flex items-center gap-2 text-primary">
               <Landmark className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
               <h2 className="text-base font-semibold">About {getScholarshipProvider(scholarship)}</h2>
             </div>
             <InfoPair label="Location" value={scholarship.country?.name ?? "Multiple countries"} />
             <InfoPair label="Type" value="Public Research University" />
             <InfoPair label="Funding" value={scholarship.coverageType} />
-            <Link to="/matches" className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-white text-sm font-semibold text-[#6d3df4] hover:bg-[#f4f1ff]">
+            <Link to="/matches" className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface text-sm font-semibold text-primary hover:bg-primary/10">
               View University Profile
               <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
             </Link>
@@ -339,7 +340,7 @@ export function ScholarshipDetailsPage() {
 
 function ErrorNotice({ message }: { message: string }) {
   return (
-    <div className="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+    <div className="mb-5 rounded-lg border border-danger/30 bg-danger/10 p-4 text-sm text-danger">
       <div className="flex items-start gap-2">
         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
         <p className="font-medium">{message}</p>
@@ -350,12 +351,12 @@ function ErrorNotice({ message }: { message: string }) {
 
 function InfoCard({ icon: Icon, title, children }: { icon: ElementType; title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-[#e6e9f2] bg-white p-5 shadow-sm">
+    <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
       <div className="mb-4 flex items-center gap-3">
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#f4f1ff] text-[#6d3df4]">
+        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
           <Icon className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
         </span>
-        <h2 className="text-base font-semibold text-[#151b2d]">{title}</h2>
+        <h2 className="text-base font-semibold text-foreground">{title}</h2>
       </div>
       {children}
     </section>
@@ -364,19 +365,19 @@ function InfoCard({ icon: Icon, title, children }: { icon: ElementType; title: s
 
 function MiniMeta({ icon: Icon, label, value, tone }: { icon: ElementType; label: string; value: string; tone: "red" | "green" | "purple" | "blue" }) {
   const colors = {
-    red: "text-red-600",
-    green: "text-emerald-600",
-    purple: "text-[#6d3df4]",
-    blue: "text-blue-600"
+    red: "text-danger",
+    green: "text-success",
+    purple: "text-primary",
+    blue: "text-info"
   };
 
   return (
     <div className="min-w-0">
-      <p className="flex items-center gap-1 text-[11px] font-medium text-[#8b92a7]">
+      <p className="flex items-center gap-1 text-[11px] font-medium text-foreground-subtle">
         <Icon className={`h-3.5 w-3.5 ${colors[tone]}`} strokeWidth={1.8} aria-hidden="true" />
         {label}
       </p>
-      <p className="mt-1 truncate font-semibold text-[#344054]">{value}</p>
+      <p className="mt-1 truncate font-semibold text-foreground">{value}</p>
     </div>
   );
 }
@@ -384,8 +385,8 @@ function MiniMeta({ icon: Icon, label, value, tone }: { icon: ElementType; label
 function DateRow({ label, value, urgent = false }: { label: string; value: string; urgent?: boolean }) {
   return (
     <div className="mb-3 flex items-center justify-between gap-3 text-sm">
-      <span className="font-medium text-[#667085]">{label}</span>
-      <span className={`font-semibold ${urgent ? "text-red-600" : "text-[#344054]"}`}>{value}</span>
+      <span className="font-medium text-foreground-muted">{label}</span>
+      <span className={`font-semibold ${urgent ? "text-danger" : "text-foreground"}`}>{value}</span>
     </div>
   );
 }
@@ -399,10 +400,10 @@ function BenefitList({ scholarship }: { scholarship: Scholarship }) {
   ];
 
   return (
-    <ul className="space-y-2 text-sm leading-6 text-[#344054]">
+    <ul className="space-y-2 text-sm leading-6 text-foreground">
       {benefits.map((benefit) => (
         <li key={benefit} className="flex gap-2">
-          <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={1.8} aria-hidden="true" />
+          <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-success" strokeWidth={1.8} aria-hidden="true" />
           {benefit}
         </li>
       ))}
@@ -412,14 +413,14 @@ function BenefitList({ scholarship }: { scholarship: Scholarship }) {
 
 function EligibilityRow({ item }: { item: { label: string; value: string; status: string } }) {
   return (
-    <div className="flex items-start justify-between gap-3 border-b border-[#edf0f6] pb-3 last:border-b-0">
+    <div className="flex items-start justify-between gap-3 border-b border-border pb-3 last:border-b-0">
       <div className="flex gap-2">
-        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={1.8} aria-hidden="true" />
-        <span className="text-sm font-medium text-[#344054]">{item.label}</span>
+        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" strokeWidth={1.8} aria-hidden="true" />
+        <span className="text-sm font-medium text-foreground">{item.label}</span>
       </div>
       <div className="text-right">
-        <p className="text-sm font-semibold text-[#344054]">{item.value}</p>
-        <span className="text-xs font-semibold text-emerald-700">{item.status}</span>
+        <p className="text-sm font-semibold text-foreground">{item.value}</p>
+        <span className="text-xs font-semibold text-success">{item.status}</span>
       </div>
     </div>
   );
@@ -428,8 +429,8 @@ function EligibilityRow({ item }: { item: { label: string; value: string; status
 function InfoPair({ label, value }: { label: string; value: string }) {
   return (
     <div className="mb-3 flex items-center justify-between gap-3 text-sm">
-      <span className="font-medium text-[#667085]">{label}</span>
-      <span className="text-right font-semibold text-[#344054]">{value}</span>
+      <span className="font-medium text-foreground-muted">{label}</span>
+      <span className="text-right font-semibold text-foreground">{value}</span>
     </div>
   );
 }
@@ -517,14 +518,14 @@ function getScholarshipProvider(scholarship: Scholarship) {
 
 function getStatusTone(status: string) {
   if (status === "ELIGIBLE") {
-    return "bg-emerald-50 text-emerald-700";
+    return "bg-success/10 text-success";
   }
 
   if (status === "ALMOST_ELIGIBLE") {
-    return "bg-amber-50 text-amber-700";
+    return "bg-warning/10 text-warning";
   }
 
-  return "bg-red-50 text-red-700";
+  return "bg-danger/10 text-danger";
 }
 
 function getLogoTone(value: string) {
@@ -550,7 +551,7 @@ function getLogoTone(value: string) {
     return "bg-[#b91c1c] text-white";
   }
 
-  return "bg-[#f0eaff] text-[#6d3df4]";
+  return "bg-primary/10 text-primary";
 }
 
 function friendlyNationality(value: string) {

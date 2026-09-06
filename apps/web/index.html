@@ -3,7 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Study Abroad Planner</title>
+    <meta name="theme-color" content="#4F46E5" />
+    <meta
+      name="description"
+      content="StudyCompass helps students plan studying abroad — match universities, find scholarships, estimate costs, track deadlines, and prepare visas in one place."
+    />
+    <meta property="og:title" content="StudyCompass — Your Future, Our Guidance" />
+    <meta
+      property="og:description"
+      content="Plan your study abroad journey: university matching, scholarships, cost calculator, deadlines, and visa prep."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234F46E5'/%3E%3Cpath d='M16 6l3.2 6.8L26 16l-6.8 3.2L16 26l-3.2-6.8L6 16l6.8-3.2z' fill='white'/%3E%3C/svg%3E"
+    />
+    <title>StudyCompass — Your Future, Our Guidance</title>
+    <script>
+      // Apply the saved theme before first paint to avoid a flash.
+      (function () {
+        try {
+          var pref = localStorage.getItem("study-abroad-theme");
+          var dark =
+            pref === "dark" ||
+            ((!pref || pref === "system") &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          if (dark) document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

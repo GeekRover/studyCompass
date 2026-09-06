@@ -92,7 +92,7 @@ export function AiAdvisorPage() {
       const welcomeMessage: ChatItem = {
         id: "welcome-msg",
         role: "assistant",
-        content: `### 👋 Welcome to your AI Study Abroad Advisor, **${response.profileSummary.name}**!\n\nI analyze your student profile (**${response.profileSummary.cgpaNormalized}/4.0 GPA**, **${response.profileSummary.englishScore}**, **$${response.profileSummary.budgetUsd.toLocaleString()} budget**) against our platform database of universities, scholarships, and country data.\n\nHere are some of the ways I can help you today:\n* **🎓 Explain University Fit**: Discover why a specific program was categorized as Safe, Target, or Reach.\n* **🌍 Compare Countries**: Multi-factor breakdown of living costs, post-study work visa, part-time hours, and tech market demand.\n* **📊 Public & Visa Insights**: Summaries of visa rules, proof of funds requirements, and intake timelines.\n* **🚀 Next Steps Roadmap**: Personalized actionable milestones tailored to your application timeline.\n\n*Note: I complement and explain our rule-based matching system and deterministic criteria.*`,
+        content: `### 👋 Welcome to your AI Study Abroad Advisor, **${response.profileSummary.name}**!\n\nI analyze your student profile (**${response.profileSummary.cgpaNormalized}/4.0 GPA**, **${response.profileSummary.englishScore}**, **$${response.profileSummary.budgetUsd.toLocaleString()} budget**) against our platform database of universities, scholarships, and country data.\n\nHere are some of the ways I can help you today:\n* **🎓 Explain University Fit**: Discover why a specific program was categorized as Safe, Target, or Reach.\n* **🌍 Compare Countries**: Multi-factor breakdown of living costs, post-study work visa, part-time hours, and tech market demand.\n* **📊 Public & Visa Insights**: Summaries of visa rules, proof of funds requirements, and intake timelines.\n* **🚀 Next Steps Roadmap**: Personalized actionable milestones tailored to your application timeline.\n\n*I explain and build on your matching results — I don't replace them.*`,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
       };
       setMessages([welcomeMessage]);
@@ -222,10 +222,10 @@ export function AiAdvisorPage() {
   if (loadingContext) {
     return (
       <div className="flex h-[70vh] flex-col items-center justify-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#f3efff] text-[#6d3df4]">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <Bot className="h-6 w-6 animate-pulse" />
         </div>
-        <p className="text-sm font-medium text-[#667085]">Connecting to AI Advisor & grounding student profile data...</p>
+        <p className="text-sm font-medium text-foreground-muted">Connecting to AI Advisor & grounding student profile data...</p>
       </div>
     );
   }
@@ -233,25 +233,16 @@ export function AiAdvisorPage() {
   return (
     <div className="mx-auto max-w-[1280px] pb-10">
       {/* Top Banner / Disclaimer */}
-      <section className="mb-6 rounded-2xl border border-[#e5dcff] bg-gradient-to-r from-[#fcfaff] via-[#f7f3ff] to-[#f4effe] p-6 shadow-sm">
+      <section className="mb-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#6d3df4] text-white shadow-md shadow-[#6d3df4]/25">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
               <Bot className="h-6 w-6" strokeWidth={2} />
             </span>
             <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-bold text-[#141b34]">AI Study Abroad Advisor</h1>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#eee7ff] px-3 py-0.5 text-xs font-semibold text-[#6d3df4]">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  {context?.llmInfo?.isLlmActive ? `LLM Powered by Grok (${context.llmInfo.model ?? "grok-2-latest"})` : "Profile Grounded LLM Advisor"}
-                </span>
-                <span className="rounded-full bg-emerald-50 px-3 py-0.5 text-xs font-medium text-emerald-700">
-                  RAG Grounded in Real Admissions Data
-                </span>
-              </div>
-              <p className="mt-1.5 text-sm leading-relaxed text-[#5a6275]">
-                Combines advanced Grok large language model reasoning with your active student profile, admission requirements, scholarships, and country work visa facts.
+              <h1 className="font-display text-2xl font-[560] tracking-[-0.01em] text-foreground">AI advisor</h1>
+              <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-foreground-muted">
+                Answers grounded in your student profile, admission requirements, scholarships, and country work-visa facts.
               </p>
             </div>
           </div>
@@ -259,7 +250,7 @@ export function AiAdvisorPage() {
             <button
               type="button"
               onClick={handleClearChat}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[#e1e5ef] bg-white px-3 text-xs font-medium text-[#667085] hover:bg-[#f8f9fc] hover:text-[#141b34]"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface px-3 text-xs font-medium text-foreground-muted hover:bg-surface-muted hover:text-foreground"
             >
               <Trash2 className="h-3.5 w-3.5" />
               Clear Conversation
@@ -269,11 +260,11 @@ export function AiAdvisorPage() {
       </section>
 
       {error ? (
-        <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+        <div className="mb-5 flex items-start gap-3 rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           <div className="flex-1">
             <p className="font-semibold">{error}</p>
-            <p className="mt-1 text-xs text-red-600">Please verify your student profile data or try another query.</p>
+            <p className="mt-1 text-xs text-danger">Please verify your student profile data or try another query.</p>
           </div>
         </div>
       ) : null}
@@ -283,44 +274,44 @@ export function AiAdvisorPage() {
         <aside className="space-y-5">
           {/* Profile Snapshot Card */}
           {context ? (
-            <div className="rounded-xl border border-[#e7eaf3] bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm font-semibold text-[#141b34]">
-                  <UserCheck className="h-4 w-4 text-[#6d3df4]" />
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <UserCheck className="h-4 w-4 text-primary" />
                   <span>Profile Grounding</span>
                 </div>
-                <Link to="/profile" className="text-xs font-semibold text-[#6d3df4] hover:underline">
+                <Link to="/profile" className="text-xs font-semibold text-primary hover:underline">
                   Edit Profile
                 </Link>
               </div>
 
               <div className="space-y-3 text-xs">
-                <div className="flex justify-between rounded-lg bg-[#f8f9fd] p-2.5">
-                  <span className="text-[#7a8194]">Target Field:</span>
-                  <span className="font-semibold text-[#141b34]">{context.profileSummary.fieldOfStudy}</span>
+                <div className="flex justify-between rounded-lg bg-surface-muted p-2.5">
+                  <span className="text-foreground-subtle">Target Field:</span>
+                  <span className="font-semibold text-foreground">{context.profileSummary.fieldOfStudy}</span>
                 </div>
-                <div className="flex justify-between rounded-lg bg-[#f8f9fd] p-2.5">
-                  <span className="text-[#7a8194]">Normalized GPA:</span>
-                  <span className="font-semibold text-[#141b34]">{context.profileSummary.cgpaNormalized} / 4.0</span>
+                <div className="flex justify-between rounded-lg bg-surface-muted p-2.5">
+                  <span className="text-foreground-subtle">Normalized GPA:</span>
+                  <span className="font-semibold text-foreground">{context.profileSummary.cgpaNormalized} / 4.0</span>
                 </div>
-                <div className="flex justify-between rounded-lg bg-[#f8f9fd] p-2.5">
-                  <span className="text-[#7a8194]">English Score:</span>
-                  <span className="font-semibold text-[#141b34]">{context.profileSummary.englishScore}</span>
+                <div className="flex justify-between rounded-lg bg-surface-muted p-2.5">
+                  <span className="text-foreground-subtle">English Score:</span>
+                  <span className="font-semibold text-foreground">{context.profileSummary.englishScore}</span>
                 </div>
-                <div className="flex justify-between rounded-lg bg-[#f8f9fd] p-2.5">
-                  <span className="text-[#7a8194]">Annual Budget:</span>
-                  <span className="font-semibold text-[#141b34]">${context.profileSummary.budgetUsd.toLocaleString()} USD</span>
+                <div className="flex justify-between rounded-lg bg-surface-muted p-2.5">
+                  <span className="text-foreground-subtle">Annual Budget:</span>
+                  <span className="font-semibold text-foreground">${context.profileSummary.budgetUsd.toLocaleString()} USD</span>
                 </div>
-                <div className="flex justify-between rounded-lg bg-[#f8f9fd] p-2.5">
-                  <span className="text-[#7a8194]">Readiness Tier:</span>
-                  <span className="font-semibold text-[#6d3df4]">{context.profileSummary.readinessTier ?? "Mid-tier"} ({context.profileSummary.readinessScore ?? 70}/100)</span>
+                <div className="flex justify-between rounded-lg bg-surface-muted p-2.5">
+                  <span className="text-foreground-subtle">Readiness Tier:</span>
+                  <span className="font-semibold text-primary">{context.profileSummary.readinessTier ?? "Mid-tier"} ({context.profileSummary.readinessScore ?? 70}/100)</span>
                 </div>
                 {context.profileSummary.preferredCountries.length ? (
-                  <div className="rounded-lg bg-[#f8f9fd] p-2.5">
-                    <span className="block text-[#7a8194] mb-1">Preferred Destinations:</span>
+                  <div className="rounded-lg bg-surface-muted p-2.5">
+                    <span className="block text-foreground-subtle mb-1">Preferred Destinations:</span>
                     <div className="flex flex-wrap gap-1">
                       {context.profileSummary.preferredCountries.map((c) => (
-                        <span key={c} className="rounded bg-white px-2 py-0.5 text-[11px] font-medium text-[#344054] border border-[#e7eaf3]">
+                        <span key={c} className="rounded bg-surface px-2 py-0.5 text-[11px] font-medium text-foreground border border-border">
                           {c}
                         </span>
                       ))}
@@ -332,13 +323,13 @@ export function AiAdvisorPage() {
           ) : null}
 
           {/* Mode Selector & Quick Tools */}
-          <div className="rounded-xl border border-[#e7eaf3] bg-white p-5 shadow-sm">
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-[#7a8194]">Advisory Focus Modes</h3>
+          <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground-subtle">Advisory Focus Modes</h3>
             <div className="space-y-1.5">
               <button
                 type="button"
                 onClick={() => setActiveMode("GENERAL")}
-                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeMode === "GENERAL" ? "bg-[#f3efff] text-[#6d3df4] font-semibold" : "text-[#4b5565] hover:bg-[#f8f9fd]"}`}
+                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeMode === "GENERAL" ? "bg-primary/10 text-primary font-semibold" : "text-foreground-muted hover:bg-surface-muted"}`}
               >
                 <MessageSquare className="h-4 w-4 shrink-0" />
                 <span>💬 Ask Anything</span>
@@ -347,7 +338,7 @@ export function AiAdvisorPage() {
               <button
                 type="button"
                 onClick={() => setActiveMode("UNIVERSITY")}
-                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeMode === "UNIVERSITY" ? "bg-[#f3efff] text-[#6d3df4] font-semibold" : "text-[#4b5565] hover:bg-[#f8f9fd]"}`}
+                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeMode === "UNIVERSITY" ? "bg-primary/10 text-primary font-semibold" : "text-foreground-muted hover:bg-surface-muted"}`}
               >
                 <GraduationCap className="h-4 w-4 shrink-0" />
                 <span>🎓 Explain University Fit</span>
@@ -356,7 +347,7 @@ export function AiAdvisorPage() {
               <button
                 type="button"
                 onClick={() => setActiveMode("COUNTRY")}
-                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeMode === "COUNTRY" ? "bg-[#f3efff] text-[#6d3df4] font-semibold" : "text-[#4b5565] hover:bg-[#f8f9fd]"}`}
+                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeMode === "COUNTRY" ? "bg-primary/10 text-primary font-semibold" : "text-foreground-muted hover:bg-surface-muted"}`}
               >
                 <Globe2 className="h-4 w-4 shrink-0" />
                 <span>🌍 Compare Countries</span>
@@ -365,7 +356,7 @@ export function AiAdvisorPage() {
               <button
                 type="button"
                 onClick={() => setActiveMode("INSIGHTS")}
-                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeMode === "INSIGHTS" ? "bg-[#f3efff] text-[#6d3df4] font-semibold" : "text-[#4b5565] hover:bg-[#f8f9fd]"}`}
+                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeMode === "INSIGHTS" ? "bg-primary/10 text-primary font-semibold" : "text-foreground-muted hover:bg-surface-muted"}`}
               >
                 <TrendingUp className="h-4 w-4 shrink-0" />
                 <span>📊 Public & Visa Insights</span>
@@ -374,7 +365,7 @@ export function AiAdvisorPage() {
               <button
                 type="button"
                 onClick={() => setActiveMode("NEXT_STEPS")}
-                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeMode === "NEXT_STEPS" ? "bg-[#f3efff] text-[#6d3df4] font-semibold" : "text-[#4b5565] hover:bg-[#f8f9fd]"}`}
+                className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition ${activeMode === "NEXT_STEPS" ? "bg-primary/10 text-primary font-semibold" : "text-foreground-muted hover:bg-surface-muted"}`}
               >
                 <Target className="h-4 w-4 shrink-0" />
                 <span>🚀 Next Steps Roadmap</span>
@@ -383,14 +374,14 @@ export function AiAdvisorPage() {
 
             {/* Mode-Specific Tool Panels */}
             {activeMode === "UNIVERSITY" && context?.availablePrograms.length ? (
-              <div className="mt-4 border-t border-[#edf0f6] pt-4">
-                <label className="block text-xs font-semibold text-[#344054] mb-1.5">
+              <div className="mt-4 border-t border-border pt-4">
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
                   Select Program to Evaluate:
                 </label>
                 <select
                   value={selectedProgramId}
                   onChange={(e) => setSelectedProgramId(e.target.value)}
-                  className="w-full rounded-lg border border-[#dfe4ef] bg-white p-2 text-xs font-medium text-[#141b34] outline-none focus:border-[#6d3df4]"
+                  className="w-full rounded-lg border border-border bg-surface p-2 text-xs font-medium text-foreground outline-none focus:border-primary"
                 >
                   {context.availablePrograms.map((prog) => (
                     <option key={prog.id} value={prog.id}>
@@ -402,7 +393,7 @@ export function AiAdvisorPage() {
                   type="button"
                   onClick={() => handleSendMessage(`Explain why ${selectedProgram?.title} at ${selectedProgram?.universityName} is suitable for my profile and why it received its match rating.`, "UNIVERSITY")}
                   disabled={sending}
-                  className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#6d3df4] py-2 text-xs font-semibold text-white hover:bg-[#5f35d8] disabled:opacity-60"
+                  className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary py-2 text-xs font-semibold text-white hover:bg-primary disabled:opacity-60"
                 >
                   <Bot className="h-3.5 w-3.5" />
                   Evaluate Program Fit
@@ -411,8 +402,8 @@ export function AiAdvisorPage() {
             ) : null}
 
             {activeMode === "COUNTRY" && context?.availableCountries.length ? (
-              <div className="mt-4 border-t border-[#edf0f6] pt-4">
-                <label className="block text-xs font-semibold text-[#344054] mb-1.5">
+              <div className="mt-4 border-t border-border pt-4">
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
                   Select 2 to 4 Countries to Compare:
                 </label>
                 <div className="flex flex-wrap gap-1.5 mb-3">
@@ -423,7 +414,7 @@ export function AiAdvisorPage() {
                         key={country.id}
                         type="button"
                         onClick={() => handleCountryToggle(country.id)}
-                        className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${isSelected ? "bg-[#6d3df4] text-white" : "border border-[#dfe4ef] bg-white text-[#4b5565] hover:bg-[#f8f9fd]"}`}
+                        className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${isSelected ? "bg-primary text-white" : "border border-border bg-surface text-foreground-muted hover:bg-surface-muted"}`}
                       >
                         {country.name}
                       </button>
@@ -434,7 +425,7 @@ export function AiAdvisorPage() {
                   type="button"
                   onClick={() => handleSendMessage(`Compare living costs, post-study work visa rights, and tech job opportunities for my chosen countries.`, "COUNTRY")}
                   disabled={sending || selectedCountryIds.length < 2}
-                  className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#6d3df4] py-2 text-xs font-semibold text-white hover:bg-[#5f35d8] disabled:opacity-60"
+                  className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary py-2 text-xs font-semibold text-white hover:bg-primary disabled:opacity-60"
                 >
                   <Globe2 className="h-3.5 w-3.5" />
                   Run Country Comparison ({selectedCountryIds.length})
@@ -443,12 +434,12 @@ export function AiAdvisorPage() {
             ) : null}
 
             {activeMode === "NEXT_STEPS" ? (
-              <div className="mt-4 border-t border-[#edf0f6] pt-4">
+              <div className="mt-4 border-t border-border pt-4">
                 <button
                   type="button"
                   onClick={() => handleSendMessage("Generate a prioritized 4-phase next steps roadmap for my profile and upcoming application intake.", "NEXT_STEPS")}
                   disabled={sending}
-                  className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#6d3df4] py-2 text-xs font-semibold text-white hover:bg-[#5f35d8] disabled:opacity-60"
+                  className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary py-2 text-xs font-semibold text-white hover:bg-primary disabled:opacity-60"
                 >
                   <Target className="h-3.5 w-3.5" />
                   Generate Action Roadmap
@@ -458,59 +449,59 @@ export function AiAdvisorPage() {
           </div>
 
           {/* Direct Platform Links */}
-          <div className="rounded-xl border border-[#e7eaf3] bg-white p-4 shadow-sm">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#7a8194] mb-3">Platform Tools</h4>
+          <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-foreground-subtle mb-3">Platform Tools</h4>
             <div className="grid gap-2 text-xs">
-              <Link to="/matches" className="flex items-center justify-between rounded-lg p-2 text-[#344054] hover:bg-[#f8f9fd] hover:text-[#6d3df4]">
+              <Link to="/matches" className="flex items-center justify-between rounded-lg p-2 text-foreground hover:bg-surface-muted hover:text-primary">
                 <span className="flex items-center gap-2">
-                  <GraduationCap className="h-3.5 w-3.5 text-[#6d3df4]" />
+                  <GraduationCap className="h-3.5 w-3.5 text-primary" />
                   University Matcher
                 </span>
-                <ChevronRight className="h-3.5 w-3.5 text-[#a0a7b8]" />
+                <ChevronRight className="h-3.5 w-3.5 text-foreground-subtle" />
               </Link>
-              <Link to="/application-strategy" className="flex items-center justify-between rounded-lg p-2 text-[#344054] hover:bg-[#f8f9fd] hover:text-[#6d3df4]">
+              <Link to="/application-strategy" className="flex items-center justify-between rounded-lg p-2 text-foreground hover:bg-surface-muted hover:text-primary">
                 <span className="flex items-center gap-2">
-                  <ClipboardList className="h-3.5 w-3.5 text-[#6d3df4]" />
+                  <ClipboardList className="h-3.5 w-3.5 text-primary" />
                   Strategy Builder (3-4-2)
                 </span>
-                <ChevronRight className="h-3.5 w-3.5 text-[#a0a7b8]" />
+                <ChevronRight className="h-3.5 w-3.5 text-foreground-subtle" />
               </Link>
-              <Link to="/scholarships" className="flex items-center justify-between rounded-lg p-2 text-[#344054] hover:bg-[#f8f9fd] hover:text-[#6d3df4]">
+              <Link to="/scholarships" className="flex items-center justify-between rounded-lg p-2 text-foreground hover:bg-surface-muted hover:text-primary">
                 <span className="flex items-center gap-2">
-                  <DollarSign className="h-3.5 w-3.5 text-[#6d3df4]" />
+                  <DollarSign className="h-3.5 w-3.5 text-primary" />
                   Scholarships Directory
                 </span>
-                <ChevronRight className="h-3.5 w-3.5 text-[#a0a7b8]" />
+                <ChevronRight className="h-3.5 w-3.5 text-foreground-subtle" />
               </Link>
-              <Link to="/countries" className="flex items-center justify-between rounded-lg p-2 text-[#344054] hover:bg-[#f8f9fd] hover:text-[#6d3df4]">
+              <Link to="/countries" className="flex items-center justify-between rounded-lg p-2 text-foreground hover:bg-surface-muted hover:text-primary">
                 <span className="flex items-center gap-2">
-                  <Globe2 className="h-3.5 w-3.5 text-[#6d3df4]" />
+                  <Globe2 className="h-3.5 w-3.5 text-primary" />
                   Country Decision Dashboard
                 </span>
-                <ChevronRight className="h-3.5 w-3.5 text-[#a0a7b8]" />
+                <ChevronRight className="h-3.5 w-3.5 text-foreground-subtle" />
               </Link>
             </div>
           </div>
         </aside>
 
         {/* Right Column: Chat Conversation Stream & Interactive Responses */}
-        <main className="flex flex-col rounded-xl border border-[#e7eaf3] bg-white shadow-sm overflow-hidden min-h-[640px]">
+        <main className="flex flex-col rounded-xl border border-border bg-surface shadow-sm overflow-hidden min-h-[640px]">
           {/* Chat Header */}
-          <div className="flex items-center justify-between border-b border-[#edf0f6] bg-[#fbfaff] px-6 py-3.5">
+          <div className="flex items-center justify-between border-b border-border bg-primary/10 px-6 py-3.5">
             <div className="flex items-center gap-3">
               <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
               </span>
               <div>
-                <h2 className="text-sm font-semibold text-[#141b34]">Active Advisory Session</h2>
-                <p className="text-[11px] text-[#7a8194]">
-                  Mode: <span className="font-semibold text-[#6d3df4]">{activeMode}</span> • Grounded in Student Database
+                <h2 className="text-sm font-semibold text-foreground">Active Advisory Session</h2>
+                <p className="text-[11px] text-foreground-subtle">
+                  Mode: <span className="font-semibold text-primary">{activeMode}</span> • Grounded in Student Database
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-md bg-[#eee7ff] px-2.5 py-1 text-[11px] font-semibold text-[#6d3df4]">
+              <span className="inline-flex items-center gap-1 rounded-md bg-[#eee7ff] px-2.5 py-1 text-[11px] font-semibold text-primary">
                 <Sparkles className="h-3 w-3" />
                 {context?.llmInfo?.isLlmActive ? `Grok LLM (${context.llmInfo.model ?? "grok-2-latest"})` : "AI Advisor"}
               </span>
@@ -526,7 +517,7 @@ export function AiAdvisorPage() {
               >
                 {/* Avatar */}
                 <div
-                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-semibold shadow-sm ${item.role === "user" ? "bg-[#6d3df4] text-white" : "bg-[#f3efff] text-[#6d3df4] border border-[#e5dcff]"}`}
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-semibold shadow-sm ${item.role === "user" ? "bg-primary text-white" : "bg-primary/10 text-primary border border-[#e5dcff]"}`}
                 >
                   {item.role === "user" ? "You" : <Bot className="h-5 w-5" />}
                 </div>
@@ -534,32 +525,32 @@ export function AiAdvisorPage() {
                 {/* Message Bubble */}
                 <div className={`max-w-[85%] space-y-3 ${item.role === "user" ? "items-end" : "items-start"}`}>
                   <div
-                    className={`rounded-2xl px-5 py-4 text-sm leading-relaxed shadow-sm ${item.role === "user" ? "bg-[#6d3df4] text-white rounded-tr-none" : "bg-[#f8f9fd] text-[#141b34] border border-[#edf0f6] rounded-tl-none"}`}
+                    className={`rounded-2xl px-5 py-4 text-sm leading-relaxed shadow-sm ${item.role === "user" ? "bg-primary text-white rounded-tr-none" : "bg-surface-muted text-foreground border border-border rounded-tl-none"}`}
                   >
                     {/* Render Formatted Markdown-style content */}
                     <FormattedMessage content={item.content} isUser={item.role === "user"} />
 
                     {/* Suitability Score Badge (if available) */}
                     {item.responseMeta?.suitabilityScore ? (
-                      <div className="mt-4 rounded-xl border border-[#e5dcff] bg-white p-3.5 text-xs text-[#141b34]">
-                        <div className="flex items-center justify-between border-b border-[#edf0f6] pb-2 mb-2">
-                          <span className="font-semibold text-[#6d3df4]">Suitability Assessment</span>
-                          <span className="rounded bg-[#eee7ff] px-2 py-0.5 font-bold text-[#6d3df4]">
+                      <div className="mt-4 rounded-xl border border-[#e5dcff] bg-surface p-3.5 text-xs text-foreground">
+                        <div className="flex items-center justify-between border-b border-border pb-2 mb-2">
+                          <span className="font-semibold text-primary">Suitability Assessment</span>
+                          <span className="rounded bg-[#eee7ff] px-2 py-0.5 font-bold text-primary">
                             Score: {item.responseMeta.suitabilityScore.overallFit}/100 ({item.responseMeta.suitabilityScore.category})
                           </span>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center text-[11px]">
-                          <div className="rounded bg-[#f8f9fd] p-1.5">
-                            <span className="text-[#7a8194] block">Academic Fit</span>
-                            <span className="font-semibold text-emerald-700">{item.responseMeta.suitabilityScore.academicFit}</span>
+                          <div className="rounded bg-surface-muted p-1.5">
+                            <span className="text-foreground-subtle block">Academic Fit</span>
+                            <span className="font-semibold text-success">{item.responseMeta.suitabilityScore.academicFit}</span>
                           </div>
-                          <div className="rounded bg-[#f8f9fd] p-1.5">
-                            <span className="text-[#7a8194] block">Budget Fit</span>
-                            <span className="font-semibold text-[#141b34]">{item.responseMeta.suitabilityScore.budgetFit}</span>
+                          <div className="rounded bg-surface-muted p-1.5">
+                            <span className="text-foreground-subtle block">Budget Fit</span>
+                            <span className="font-semibold text-foreground">{item.responseMeta.suitabilityScore.budgetFit}</span>
                           </div>
-                          <div className="rounded bg-[#f8f9fd] p-1.5">
-                            <span className="text-[#7a8194] block">English Fit</span>
-                            <span className="font-semibold text-emerald-700">{item.responseMeta.suitabilityScore.englishFit}</span>
+                          <div className="rounded bg-surface-muted p-1.5">
+                            <span className="text-foreground-subtle block">English Fit</span>
+                            <span className="font-semibold text-success">{item.responseMeta.suitabilityScore.englishFit}</span>
                           </div>
                         </div>
                       </div>
@@ -568,8 +559,8 @@ export function AiAdvisorPage() {
                     {/* Referenced Entities Cards */}
                     {item.responseMeta?.referencedEntities && item.responseMeta.referencedEntities.length > 0 ? (
                       <div className="mt-4 border-t border-[#e5e9f2] pt-3">
-                        <p className="text-[11px] font-semibold text-[#7a8194] mb-2 flex items-center gap-1.5">
-                          <Compass className="h-3.5 w-3.5 text-[#6d3df4]" />
+                        <p className="text-[11px] font-semibold text-foreground-subtle mb-2 flex items-center gap-1.5">
+                          <Compass className="h-3.5 w-3.5 text-primary" />
                           Referenced Database Entities:
                         </p>
                         <div className="grid gap-2 sm:grid-cols-2">
@@ -577,19 +568,19 @@ export function AiAdvisorPage() {
                             <Link
                               key={ent.id}
                               to={ent.link ?? "/matches"}
-                              className="flex items-center justify-between rounded-lg border border-[#e2e7f2] bg-white p-2.5 text-xs transition hover:border-[#6d3df4] hover:shadow-sm"
+                              className="flex items-center justify-between rounded-lg border border-[#e2e7f2] bg-surface p-2.5 text-xs transition hover:border-primary hover:shadow-sm"
                             >
                               <div className="min-w-0 pr-2">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="font-semibold text-[#141b34] truncate">{ent.name}</span>
+                                  <span className="font-semibold text-foreground truncate">{ent.name}</span>
                                   {ent.badge ? (
-                                    <span className="rounded bg-[#f3efff] px-1.5 py-0.5 text-[10px] font-semibold text-[#6d3df4]">
+                                    <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
                                       {ent.badge}
                                     </span>
                                   ) : null}
                                 </div>
                                 {ent.subtext ? (
-                                  <span className="block text-[11px] text-[#7a8194] truncate">{ent.subtext}</span>
+                                  <span className="block text-[11px] text-foreground-subtle truncate">{ent.subtext}</span>
                                 ) : null}
                               </div>
                               <ArrowRight className="h-3.5 w-3.5 shrink-0 text-[#8c94a8]" />
@@ -602,28 +593,28 @@ export function AiAdvisorPage() {
                     {/* Next Steps Checklist Cards */}
                     {item.responseMeta?.nextSteps && item.responseMeta.nextSteps.length > 0 ? (
                       <div className="mt-4 space-y-2 border-t border-[#e5e9f2] pt-3">
-                        <p className="text-[11px] font-semibold text-[#7a8194] mb-1.5 flex items-center gap-1.5">
-                          <ClipboardList className="h-3.5 w-3.5 text-[#6d3df4]" />
+                        <p className="text-[11px] font-semibold text-foreground-subtle mb-1.5 flex items-center gap-1.5">
+                          <ClipboardList className="h-3.5 w-3.5 text-primary" />
                           Recommended Next Step Milestones:
                         </p>
                         {item.responseMeta.nextSteps.map((step) => (
                           <div
                             key={step.id}
-                            className="flex flex-col gap-2 rounded-xl border border-[#e2e7f2] bg-white p-3 sm:flex-row sm:items-center sm:justify-between"
+                            className="flex flex-col gap-2 rounded-xl border border-[#e2e7f2] bg-surface p-3 sm:flex-row sm:items-center sm:justify-between"
                           >
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${step.priority === "HIGH" ? "bg-red-50 text-red-700 border border-red-100" : "bg-blue-50 text-blue-700 border border-blue-100"}`}>
+                                <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${step.priority === "HIGH" ? "bg-danger/10 text-danger border border-danger/30" : "bg-info/10 text-info border border-info/30"}`}>
                                   {step.priority} PRIORITY
                                 </span>
-                                <h4 className="text-xs font-semibold text-[#141b34]">{step.title}</h4>
+                                <h4 className="text-xs font-semibold text-foreground">{step.title}</h4>
                               </div>
-                              <p className="text-[11px] text-[#667085] leading-relaxed">{step.description}</p>
+                              <p className="text-[11px] text-foreground-muted leading-relaxed">{step.description}</p>
                             </div>
                             {step.actionUrl ? (
                               <Link
                                 to={step.actionUrl}
-                                className="inline-flex shrink-0 items-center justify-center gap-1 rounded-lg bg-[#f3efff] px-3 py-1.5 text-xs font-semibold text-[#6d3df4] hover:bg-[#6d3df4] hover:text-white transition"
+                                className="inline-flex shrink-0 items-center justify-center gap-1 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary hover:text-white transition"
                               >
                                 <span>{step.actionLabel ?? "Take Action"}</span>
                                 <ChevronRight className="h-3 w-3" />
@@ -643,7 +634,7 @@ export function AiAdvisorPage() {
                       <button
                         type="button"
                         onClick={() => handleCopy(item.content, item.id)}
-                        className="inline-flex items-center gap-1 text-[#667085] hover:text-[#141b34]"
+                        className="inline-flex items-center gap-1 text-foreground-muted hover:text-foreground"
                       >
                         <Copy className="h-3 w-3" />
                         <span>{copiedId === item.id ? "Copied!" : "Copy"}</span>
@@ -651,7 +642,7 @@ export function AiAdvisorPage() {
                       {item.responseMeta?.llmInfo?.isLlmActive ? (
                         <>
                           <span>•</span>
-                          <span className="inline-flex items-center gap-1 rounded bg-[#eee7ff] px-1.5 py-0.5 text-[10px] font-semibold text-[#6d3df4]">
+                          <span className="inline-flex items-center gap-1 rounded bg-[#eee7ff] px-1.5 py-0.5 text-[10px] font-semibold text-primary">
                             <Sparkles className="h-2.5 w-2.5" />
                             Grok LLM
                           </span>
@@ -665,14 +656,14 @@ export function AiAdvisorPage() {
                   {/* Suggested Follow-ups Chips */}
                   {item.responseMeta?.suggestedFollowUps && item.responseMeta.suggestedFollowUps.length > 0 ? (
                     <div className="mt-2 space-y-1 pl-2">
-                      <p className="text-[11px] font-semibold text-[#7a8194]">Suggested follow-up questions:</p>
+                      <p className="text-[11px] font-semibold text-foreground-subtle">Suggested follow-up questions:</p>
                       <div className="flex flex-wrap gap-1.5">
                         {item.responseMeta.suggestedFollowUps.map((followUp, idx) => (
                           <button
                             key={idx}
                             type="button"
                             onClick={() => handleSendMessage(followUp)}
-                            className="rounded-full border border-[#dcd7fe] bg-[#faf8ff] px-3 py-1 text-xs font-medium text-[#6d3df4] hover:bg-[#6d3df4] hover:text-white transition"
+                            className="rounded-full border border-[#dcd7fe] bg-[#faf8ff] px-3 py-1 text-xs font-medium text-primary hover:bg-primary hover:text-white transition"
                           >
                             {followUp}
                           </button>
@@ -686,14 +677,14 @@ export function AiAdvisorPage() {
 
             {sending ? (
               <div className="flex gap-3.5">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f3efff] text-[#6d3df4] border border-[#e5dcff]">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-[#e5dcff]">
                   <Bot className="h-5 w-5 animate-spin" />
                 </div>
-                <div className="rounded-2xl rounded-tl-none border border-[#edf0f6] bg-[#f8f9fd] px-5 py-4 text-xs text-[#667085] shadow-sm">
+                <div className="rounded-2xl rounded-tl-none border border-border bg-surface-muted px-5 py-4 text-xs text-foreground-muted shadow-sm">
                   <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-[#6d3df4] animate-bounce"></span>
-                    <span className="h-2 w-2 rounded-full bg-[#6d3df4] animate-bounce [animation-delay:0.2s]"></span>
-                    <span className="h-2 w-2 rounded-full bg-[#6d3df4] animate-bounce [animation-delay:0.4s]"></span>
+                    <span className="h-2 w-2 rounded-full bg-primary animate-bounce"></span>
+                    <span className="h-2 w-2 rounded-full bg-primary animate-bounce [animation-delay:0.2s]"></span>
+                    <span className="h-2 w-2 rounded-full bg-primary animate-bounce [animation-delay:0.4s]"></span>
                     <span className="ml-2 font-medium">Synthesizing personalized advice from platform database...</span>
                   </div>
                 </div>
@@ -705,8 +696,8 @@ export function AiAdvisorPage() {
 
           {/* Quick Prompt Chips (Top of input box) */}
           {context?.samplePrompts && messages.length <= 2 ? (
-            <div className="border-t border-[#edf0f6] bg-[#fafbfc] px-6 py-3">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-[#7a8194] mb-2">
+            <div className="border-t border-border bg-[#fafbfc] px-6 py-3">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground-subtle mb-2">
                 <Lightbulb className="h-3.5 w-3.5 text-[#f59e0b]" />
                 <span>Suggested quick queries for your profile:</span>
               </div>
@@ -716,9 +707,9 @@ export function AiAdvisorPage() {
                     key={p.id}
                     type="button"
                     onClick={() => handleSendMessage(p.prompt, p.category as AdvisoryMode)}
-                    className="rounded-lg border border-[#e2e7f2] bg-white px-3 py-1.5 text-left text-xs font-medium text-[#344054] hover:border-[#6d3df4] hover:bg-[#fcfaff] transition"
+                    className="rounded-lg border border-[#e2e7f2] bg-surface px-3 py-1.5 text-left text-xs font-medium text-foreground hover:border-primary hover:bg-[#fcfaff] transition"
                   >
-                    {p.title}: <span className="text-[#667085]">{p.prompt.slice(0, 45)}...</span>
+                    {p.title}: <span className="text-foreground-muted">{p.prompt.slice(0, 45)}...</span>
                   </button>
                 ))}
               </div>
@@ -726,13 +717,13 @@ export function AiAdvisorPage() {
           ) : null}
 
           {/* Input Box Footer */}
-          <div className="border-t border-[#edf0f6] bg-white p-4">
+          <div className="border-t border-border bg-surface p-4">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendMessage();
               }}
-              className="flex items-center gap-2 rounded-xl border border-[#dfe4ef] bg-white px-3 py-2 focus-within:border-[#6d3df4] focus-within:ring-2 focus-within:ring-[#6d3df4]/15 shadow-sm"
+              className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/15 shadow-sm"
             >
               <input
                 ref={inputRef}
@@ -750,13 +741,13 @@ export function AiAdvisorPage() {
                           : "Ask any personalized question about universities, scholarships, countries, or next steps..."
                 }
                 disabled={sending}
-                className="w-full border-0 bg-transparent text-sm font-normal text-[#141b34] outline-none placeholder:text-[#9aa2b5] disabled:opacity-60"
+                className="w-full border-0 bg-transparent text-sm font-normal text-foreground outline-none placeholder:text-[#9aa2b5] disabled:opacity-60"
               />
 
               <button
                 type="submit"
                 disabled={!inputQuery.trim() || sending}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#6d3df4] text-white transition hover:bg-[#5f35d8] disabled:opacity-40"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-white transition hover:bg-primary disabled:opacity-40"
               >
                 <Send className="h-4 w-4" />
               </button>
@@ -791,7 +782,7 @@ function FormattedMessage({ content, isUser }: { content: string; isUser: boolea
 
         if (trimmed.startsWith("### ")) {
           return (
-            <h3 key={index} className="text-base font-bold text-[#141b34] mt-2 mb-1">
+            <h3 key={index} className="text-base font-bold text-foreground mt-2 mb-1">
               {trimmed.replace("### ", "")}
             </h3>
           );
@@ -814,7 +805,7 @@ function FormattedMessage({ content, isUser }: { content: string; isUser: boolea
         }
 
         if (trimmed.startsWith("---")) {
-          return <hr key={index} className="my-2 border-[#edf0f6]" />;
+          return <hr key={index} className="my-2 border-border" />;
         }
 
         if (trimmed.startsWith("| ") && trimmed.endsWith(" |")) {
@@ -829,7 +820,7 @@ function FormattedMessage({ content, isUser }: { content: string; isUser: boolea
           }
 
           return (
-            <div key={index} className="grid grid-flow-col auto-cols-fr gap-2 rounded bg-white p-2 text-xs border border-[#edf0f6] font-mono">
+            <div key={index} className="grid grid-flow-col auto-cols-fr gap-2 rounded bg-surface p-2 text-xs border border-border font-mono">
               {cells.map((cell, cIdx) => (
                 <span key={cIdx} className="truncate">
                   {cell.replace(/\*\*/g, "")}
@@ -842,8 +833,8 @@ function FormattedMessage({ content, isUser }: { content: string; isUser: boolea
         if (trimmed.startsWith("* ") || trimmed.startsWith("- ")) {
           const bulletText = trimmed.replace(/^[\*\-]\s+/, "");
           return (
-            <div key={index} className="flex items-start gap-2 pl-1 text-xs leading-relaxed text-[#344054]">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#6d3df4]" />
+            <div key={index} className="flex items-start gap-2 pl-1 text-xs leading-relaxed text-foreground">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               <span dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(bulletText) }} />
             </div>
           );
@@ -853,8 +844,8 @@ function FormattedMessage({ content, isUser }: { content: string; isUser: boolea
           const numMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
           if (numMatch) {
             return (
-              <div key={index} className="flex items-start gap-2 pl-1 text-xs leading-relaxed text-[#344054]">
-                <span className="font-bold text-[#6d3df4]">{numMatch[1]}.</span>
+              <div key={index} className="flex items-start gap-2 pl-1 text-xs leading-relaxed text-foreground">
+                <span className="font-bold text-primary">{numMatch[1]}.</span>
                 <span dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(numMatch[2]) }} />
               </div>
             );
@@ -868,7 +859,7 @@ function FormattedMessage({ content, isUser }: { content: string; isUser: boolea
         return (
           <p
             key={index}
-            className="text-xs leading-relaxed text-[#344054]"
+            className="text-xs leading-relaxed text-foreground"
             dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(trimmed) }}
           />
         );
@@ -879,7 +870,7 @@ function FormattedMessage({ content, isUser }: { content: string; isUser: boolea
 
 function formatInlineMarkdown(text: string): string {
   return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-[#141b34]">$1</strong>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-foreground">$1</strong>')
     .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-    .replace(/`([^`]+)`/g, '<code class="bg-[#f0edf9] px-1 py-0.5 rounded text-[11px] text-[#6d3df4]">$1</code>');
+    .replace(/`([^`]+)`/g, '<code class="bg-[#f0edf9] px-1 py-0.5 rounded text-[11px] text-primary">$1</code>');
 }

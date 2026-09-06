@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../api/client";
+import { PageLoader } from "../components/ui/Skeleton";
 import { useAuth } from "../state/AuthContext";
 import type { Country, ProfileResponse, Scholarship, ScholarshipDeadline, ScholarshipMatch, ScholarshipMatchesResponse } from "../types";
 
@@ -348,12 +349,12 @@ export function ScholarshipsPage() {
   }
 
   if (loading) {
-    return <div className="text-sm font-medium text-[#667085]">Loading scholarships</div>;
+    return <div className="mx-auto max-w-5xl"><PageLoader label="Loading scholarships" /></div>;
   }
 
   return (
     <div className="mx-auto max-w-[1240px]">
-      {message ? <div className="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-700">{message}</div> : null}
+      {message ? <div className="mb-5 rounded-lg border border-success/30 bg-success/10 p-4 text-sm font-medium text-success">{message}</div> : null}
       {error ? <ErrorNotice message={error} /> : null}
 
       {view === "search" ? (
@@ -496,24 +497,24 @@ function SearchStep({
       <div>
         <header className="mb-5">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold text-[#151b2d]">Find Scholarships</h1>
-            <span className="rounded-full bg-[#f0eaff] px-3 py-1 text-xs font-semibold text-[#6d3df4]">Step 1 of 3</span>
+            <h1 className="font-display text-2xl font-[560] tracking-[-0.01em] text-foreground">Find Scholarships</h1>
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Step 1 of 3</span>
           </div>
-          <p className="mt-2 text-sm text-[#667085]">We will find scholarships you are eligible for based on your profile</p>
+          <p className="mt-2 text-sm text-foreground-muted">We will find scholarships you are eligible for based on your profile</p>
         </header>
 
-        <section className="mb-5 rounded-xl border border-[#e6e9f2] bg-white p-5 shadow-sm">
+        <section className="mb-5 rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#f4f1ff] text-[#6d3df4]">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <UserRound className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </span>
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-base font-semibold text-[#151b2d]">Your Profile Summary</h2>
-                <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Complete ({profileCompleteness}%)</span>
+                <h2 className="text-base font-semibold text-foreground">Your Profile Summary</h2>
+                <span className="rounded-full bg-success/10 px-2.5 py-1 text-xs font-semibold text-success">Complete ({profileCompleteness}%)</span>
               </div>
             </div>
-            <Link to="/profile" className="inline-flex items-center gap-1 text-sm font-semibold text-[#6d3df4]">
+            <Link to="/profile" className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
               View / Edit Profile
               <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
             </Link>
@@ -528,15 +529,15 @@ function SearchStep({
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#e6e9f2] bg-white p-5 shadow-sm">
+        <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#f4f1ff] text-[#6d3df4]">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <SlidersHorizontal className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </span>
-              <h2 className="text-base font-semibold text-[#151b2d]">Find Scholarships That Match Your Profile</h2>
+              <h2 className="text-base font-semibold text-foreground">Find Scholarships That Match Your Profile</h2>
             </div>
-            <button type="button" onClick={onReset} className="inline-flex items-center gap-2 text-sm font-semibold text-[#6d3df4]">
+            <button type="button" onClick={onReset} className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
               Clear All
               <RefreshCw className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
             </button>
@@ -546,23 +547,23 @@ function SearchStep({
             <div>
               <FieldLabel label="Preferred Countries" />
               <div className="relative">
-                <select value={countryPick} onChange={(event) => onCountryPick(event.target.value)} className="h-11 w-full appearance-none rounded-lg border border-[#dfe4ef] bg-white px-3 pr-9 text-sm text-[#344054] outline-none focus:border-[#6d3df4] focus:ring-2 focus:ring-[#6d3df4]/10">
+                <select value={countryPick} onChange={(event) => onCountryPick(event.target.value)} className="h-11 w-full appearance-none rounded-lg border border-border bg-surface px-3 pr-9 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring/10">
                   <option value="">Select countries</option>
                   {countryOptions.map((country) => (
                     <option key={country} value={country}>{country}</option>
                   ))}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-3.5 h-4 w-4 text-[#8b92a7]" strokeWidth={1.8} aria-hidden="true" />
+                <ChevronDown className="pointer-events-none absolute right-3 top-3.5 h-4 w-4 text-foreground-subtle" strokeWidth={1.8} aria-hidden="true" />
               </div>
               <div className="mt-2 flex min-h-7 flex-wrap gap-2">
                 {selectedCountries.map((country) => (
-                  <button key={country} type="button" onClick={() => onRemoveCountry(country)} className="inline-flex h-7 items-center gap-1 rounded-md bg-[#f0eaff] px-2.5 text-xs font-medium text-[#6d3df4]">
+                  <button key={country} type="button" onClick={() => onRemoveCountry(country)} className="inline-flex h-7 items-center gap-1 rounded-md bg-primary/10 px-2.5 text-xs font-medium text-primary">
                     {country}
                     <X className="h-3 w-3" strokeWidth={1.9} aria-hidden="true" />
                   </button>
                 ))}
               </div>
-              <p className="mt-1 text-xs text-[#8b92a7]">You can select multiple countries</p>
+              <p className="mt-1 text-xs text-foreground-subtle">You can select multiple countries</p>
             </div>
 
             <SelectField label="Degree Level" value={degreeLevel} onChange={onDegreeLevel} options={degreeOptions} />
@@ -575,8 +576,8 @@ function SearchStep({
             <RangeField label="CGPA" value={minCgpa} min={0} max={4} step={0.1} left="Any" right="4.0" display={minCgpa ? minCgpa.toFixed(1) : "Any"} onChange={onMinCgpa} />
           </div>
 
-          <div className="mt-5 border-t border-[#edf0f6] pt-5">
-            <p className="mb-3 text-sm font-semibold text-[#344054]">More Filters</p>
+          <div className="mt-5 border-t border-border pt-5">
+            <p className="mb-3 text-sm font-semibold text-foreground">More Filters</p>
             <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
               <CheckOption label="Fully Funded" checked={moreFilters.fullyFunded} onChange={(checked) => onMoreFilters({ ...moreFilters, fullyFunded: checked })} />
               <CheckOption label="Living Allowance" checked={moreFilters.livingAllowance} onChange={(checked) => onMoreFilters({ ...moreFilters, livingAllowance: checked })} />
@@ -589,17 +590,17 @@ function SearchStep({
             </div>
           </div>
 
-          <div className="mt-5 flex flex-col gap-3 border-t border-[#edf0f6] pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <button type="button" onClick={onReset} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#dfe4ef] px-5 text-sm font-semibold text-[#344054] hover:bg-[#f8f8fb]">
+          <div className="mt-5 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <button type="button" onClick={onReset} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border px-5 text-sm font-semibold text-foreground hover:bg-surface-muted">
               <RefreshCw className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Reset Filters
             </button>
             <div className="text-right">
-              <button type="button" onClick={onGenerate} disabled={generating} className="inline-flex h-11 min-w-[250px] items-center justify-center gap-2 rounded-lg bg-[#6d3df4] px-5 text-sm font-semibold text-white shadow-sm hover:bg-[#5f35d8] disabled:opacity-60">
+              <button type="button" onClick={onGenerate} disabled={generating} className="inline-flex h-11 min-w-[250px] items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-white shadow-sm hover:bg-primary disabled:opacity-60">
                 <span>{generating ? "Finding scholarships" : "Find My Eligible Scholarships"}</span>
                 <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </button>
-              <p className="mt-2 text-xs text-[#667085]">We never share your information with anyone.</p>
+              <p className="mt-2 text-xs text-foreground-muted">We never share your information with anyone.</p>
             </div>
           </div>
         </section>
@@ -624,7 +625,7 @@ function SearchStep({
               <PopularMini key={scholarship.id} scholarship={scholarship} />
             ))}
           </div>
-          <button type="button" onClick={onGenerate} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#6d3df4]">
+          <button type="button" onClick={onGenerate} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary">
             Browse all scholarships
             <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           </button>
@@ -692,22 +693,22 @@ function ResultsStep({
       <div>
         <header className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <button type="button" onClick={onBack} className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-[#6d3df4]">
+            <button type="button" onClick={onBack} className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-primary">
               <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Back to Search
             </button>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold text-[#151b2d]">Scholarship Matches</h1>
-              <span className="rounded-full bg-[#f0eaff] px-3 py-1 text-xs font-semibold text-[#6d3df4]">Step 2 of 3</span>
+              <h1 className="font-display text-2xl font-[560] tracking-[-0.01em] text-foreground">Scholarship Matches</h1>
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Step 2 of 3</span>
             </div>
-            <p className="mt-2 text-sm text-[#667085]">We found {counts.total} scholarships you are eligible or almost eligible for</p>
+            <p className="mt-2 text-sm text-foreground-muted">We found {counts.total} scholarships you are eligible or almost eligible for</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={onSaveSearch} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#dfe4ef] px-4 text-sm font-semibold text-[#344054] hover:bg-[#f8f8fb]">
+            <button type="button" onClick={onSaveSearch} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-foreground hover:bg-surface-muted">
               <Bookmark className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Save Search
             </button>
-            <button type="button" onClick={onModify} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#dfe4ef] px-4 text-sm font-semibold text-[#344054] hover:bg-[#f8f8fb]">
+            <button type="button" onClick={onModify} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold text-foreground hover:bg-surface-muted">
               <SlidersHorizontal className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Modify Search
             </button>
@@ -727,13 +728,13 @@ function ResultsStep({
             ["DEADLINE", "Deadline"],
             ["AMOUNT", "Coverage Amount"]
           ]} />
-          <div className="flex items-center gap-2 text-sm text-[#667085]">
+          <div className="flex items-center gap-2 text-sm text-foreground-muted">
             <span>View:</span>
-            <button type="button" className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#6d3df4] bg-[#f4f1ff] px-3 font-semibold text-[#6d3df4]">
+            <button type="button" className="inline-flex h-9 items-center gap-2 rounded-lg border border-primary bg-primary/10 px-3 font-semibold text-primary">
               <LayoutGrid className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Card View
             </button>
-            <button type="button" className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#dfe4ef] bg-white px-3 font-semibold text-[#667085]">
+            <button type="button" className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-surface px-3 font-semibold text-foreground-muted">
               <Table2 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Table View
             </button>
@@ -754,11 +755,11 @@ function ResultsStep({
             ))}
           </section>
         ) : (
-          <section className="rounded-xl border border-dashed border-[#d6dbe8] bg-white p-8 text-center">
-            <Award className="mx-auto h-8 w-8 text-[#5f3bd7]" strokeWidth={1.8} aria-hidden="true" />
-            <h2 className="mt-4 text-lg font-semibold text-[#151b2d]">No scholarship matches in this view</h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#667085]">Clear filters or run the eligibility engine again after updating your profile.</p>
-            <button type="button" onClick={onGenerate} disabled={generating} className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#6d3df4] px-5 text-sm font-semibold text-white hover:bg-[#5f35d8] disabled:opacity-60">
+          <section className="rounded-xl border border-dashed border-border bg-surface p-8 text-center">
+            <Award className="mx-auto h-8 w-8 text-primary" strokeWidth={1.8} aria-hidden="true" />
+            <h2 className="mt-4 text-lg font-semibold text-foreground">No scholarship matches in this view</h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-foreground-muted">Clear filters or run the eligibility engine again after updating your profile.</p>
+            <button type="button" onClick={onGenerate} disabled={generating} className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-white hover:bg-primary disabled:opacity-60">
               <RefreshCw className={`h-4 w-4 ${generating ? "animate-spin" : ""}`} strokeWidth={1.8} aria-hidden="true" />
               <span>{generating ? "Finding" : "Find scholarships"}</span>
             </button>
@@ -767,37 +768,37 @@ function ResultsStep({
       </div>
 
       <aside className="space-y-5">
-        <section className="rounded-xl border border-[#e6e9f2] bg-white p-5 shadow-sm">
+        <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-[#151b2d]">Refine Results</h2>
-            <button type="button" onClick={onClear} className="text-xs font-semibold text-[#6d3df4]">Clear All</button>
+            <h2 className="text-base font-semibold text-foreground">Refine Results</h2>
+            <button type="button" onClick={onClear} className="text-xs font-semibold text-primary">Clear All</button>
           </div>
           <div className="space-y-4">
             <SelectField label="Country" value={selectedCountries[0] ?? ""} onChange={onCountryChange} options={["", ...countryOptions]} labels={{ "": "All Countries" }} />
             <SelectField label="Funding Type" value={funding} onChange={onFunding} options={["ALL", "FULL", "PARTIAL"]} labels={{ ALL: "All Funding Types", FULL: "Fully Funded", PARTIAL: "Partial Funding" }} />
             <SelectField label="Coverage Type" value={coverage} onChange={onCoverage} options={["ALL", "FULL", "MAJOR", "PARTIAL"]} labels={{ ALL: "All Coverage Types", FULL: "Full Funding", MAJOR: "Major Funding", PARTIAL: "Partial Funding" }} />
             <SelectField label="Deadline" value={deadlineWindow} onChange={onDeadlineWindow} options={["ALL", "30", "60", "90"]} labels={{ ALL: "All Deadlines", "30": "Next 30 days", "60": "Next 60 days", "90": "Next 90 days" }} />
-            <button type="button" onClick={onGenerate} disabled={generating} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#6d3df4] text-sm font-semibold text-white hover:bg-[#5f35d8] disabled:opacity-60">
+            <button type="button" onClick={onGenerate} disabled={generating} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-white hover:bg-primary disabled:opacity-60">
               <SlidersHorizontal className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Apply Filters
             </button>
           </div>
         </section>
 
-        <section className="rounded-xl border border-emerald-100 bg-emerald-50 p-5">
-          <h2 className="text-base font-semibold text-emerald-800">Match Insights</h2>
+        <section className="rounded-xl border border-success/30 bg-success/10 p-5">
+          <h2 className="text-base font-semibold text-success">Match Insights</h2>
           <p className="mt-3 text-sm leading-6 text-emerald-900">Great news! You have {counts.eligible} scholarships you are eligible for.</p>
           <p className="mt-3 text-sm leading-6 text-emerald-900">Improve your IELTS score to unlock more scholarships.</p>
-          <Link to="/readiness" className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-white px-4 text-sm font-semibold text-emerald-700">
+          <Link to="/readiness" className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-success/30 bg-surface px-4 text-sm font-semibold text-success">
             See How to Improve
             <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           </Link>
         </section>
 
-        <section className="rounded-xl border border-amber-100 bg-amber-50 p-5">
-          <h2 className="text-base font-semibold text-amber-800">Need Help?</h2>
+        <section className="rounded-xl border border-warning/30 bg-warning/10 p-5">
+          <h2 className="text-base font-semibold text-warning">Need Help?</h2>
           <p className="mt-3 text-sm leading-6 text-amber-900">Ask our AI Advisor to find more scholarships that fit your profile.</p>
-          <Link to="/readiness" className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-amber-200 bg-white px-4 text-sm font-semibold text-amber-700">
+          <Link to="/readiness" className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-warning/30 bg-surface px-4 text-sm font-semibold text-warning">
             Ask AI Advisor
             <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           </Link>
@@ -824,17 +825,17 @@ function MatchRow({
   const tone = getStatusTone(match.status);
 
   return (
-    <article className="grid gap-4 rounded-xl border border-[#e6e9f2] bg-white p-4 shadow-sm lg:grid-cols-[1fr_120px_150px]">
+    <article className="grid gap-4 rounded-xl border border-border bg-surface p-4 shadow-sm lg:grid-cols-[1fr_120px_150px]">
       <div className="flex min-w-0 gap-4">
         <ScholarshipLogo scholarship={scholarship} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="truncate text-base font-semibold text-[#151b2d]">{scholarship.name}</h2>
+            <h2 className="truncate text-base font-semibold text-foreground">{scholarship.name}</h2>
             <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${tone.badge}`}>{formatStatus(match.status)}</span>
           </div>
-          <p className="mt-1 text-sm text-[#667085]">{scholarship.country?.name ?? "Multiple countries"} / {scholarship.degreeLevel}</p>
-          <p className="mt-2 line-clamp-1 text-sm text-[#344054]">{match.reasons[0] ?? "Matched against your academic profile."}</p>
-          <div className="mt-4 grid gap-3 text-xs text-[#667085] sm:grid-cols-4">
+          <p className="mt-1 text-sm text-foreground-muted">{scholarship.country?.name ?? "Multiple countries"} / {scholarship.degreeLevel}</p>
+          <p className="mt-2 line-clamp-1 text-sm text-foreground">{match.reasons[0] ?? "Matched against your academic profile."}</p>
+          <div className="mt-4 grid gap-3 text-xs text-foreground-muted sm:grid-cols-4">
             <MiniMeta icon={CalendarDays} label="Deadline" value={formatDate(scholarship.deadline)} />
             <MiniMeta icon={CircleDollarSign} label="Coverage" value={scholarship.amountUsd ? `USD ${formatNumber(scholarship.amountUsd)}` : "Varies"} />
             <MiniMeta icon={GraduationCap} label="Degree Level" value={shortDegree(scholarship.degreeLevel)} />
@@ -845,20 +846,20 @@ function MatchRow({
 
       <div className="flex flex-col items-start justify-center lg:items-center">
         <ScoreRing value={match.matchingPercentage} status={match.status} />
-        <p className="mt-2 text-xs font-semibold text-[#344054]">Match Score</p>
-        <Link to={`/scholarships/${scholarship.id}`} className="mt-1 text-xs font-semibold text-[#6d3df4]">Why this match?</Link>
+        <p className="mt-2 text-xs font-semibold text-foreground">Match Score</p>
+        <Link to={`/scholarships/${scholarship.id}`} className="mt-1 text-xs font-semibold text-primary">Why this match?</Link>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 lg:flex-col lg:items-stretch lg:justify-center">
-        <button type="button" onClick={() => onSave(scholarship.id)} disabled={saving || scholarship.isSaved} className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent px-3 text-sm font-semibold text-[#6d3df4] hover:bg-[#f4f1ff] disabled:opacity-60">
+        <button type="button" onClick={() => onSave(scholarship.id)} disabled={saving || scholarship.isSaved} className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent px-3 text-sm font-semibold text-primary hover:bg-primary/10 disabled:opacity-60">
           <Bookmark className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           {scholarship.isSaved ? "Saved" : saving ? "Saving" : "Save"}
         </button>
-        <button type="button" onClick={() => onAddDeadline(scholarship.id)} disabled={addingDeadline || scholarship.deadlineTracked || !scholarship.deadline} className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent px-3 text-sm font-semibold text-[#344054] hover:bg-[#f8f8fb] disabled:opacity-60">
+        <button type="button" onClick={() => onAddDeadline(scholarship.id)} disabled={addingDeadline || scholarship.deadlineTracked || !scholarship.deadline} className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-transparent px-3 text-sm font-semibold text-foreground hover:bg-surface-muted disabled:opacity-60">
           <CalendarPlus className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           {scholarship.deadlineTracked ? "Tracked" : "Add to Tracker"}
         </button>
-        <Link to={`/scholarships/${scholarship.id}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] px-4 text-sm font-semibold text-[#6d3df4] hover:bg-[#f4f1ff]">
+        <Link to={`/scholarships/${scholarship.id}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] px-4 text-sm font-semibold text-primary hover:bg-primary/10">
           View Details
           <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
         </Link>
@@ -869,7 +870,7 @@ function MatchRow({
 
 function ErrorNotice({ message }: { message: string }) {
   return (
-    <div className="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+    <div className="mb-5 rounded-lg border border-danger/30 bg-danger/10 p-4 text-sm text-danger">
       <div className="flex items-start gap-2">
         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
         <div>
@@ -883,20 +884,20 @@ function ErrorNotice({ message }: { message: string }) {
 
 function ProfileMetric({ icon: Icon, label, value, tone }: { icon: ElementType; label: string; value: string; tone: "red" | "purple" | "blue" | "green" }) {
   const colors = {
-    red: "bg-red-50 text-red-600",
-    purple: "bg-[#f4f1ff] text-[#6d3df4]",
-    blue: "bg-blue-50 text-blue-600",
-    green: "bg-emerald-50 text-emerald-600"
+    red: "bg-danger/10 text-danger",
+    purple: "bg-primary/10 text-primary",
+    blue: "bg-info/10 text-info",
+    green: "bg-success/10 text-success"
   };
 
   return (
-    <div className="flex items-center gap-3 border-r border-[#edf0f6] last:border-r-0">
+    <div className="flex items-center gap-3 border-r border-border last:border-r-0">
       <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colors[tone]}`}>
         <Icon className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
       </span>
       <div className="min-w-0">
-        <p className="text-xs font-medium text-[#8b92a7]">{label}</p>
-        <p className="truncate text-sm font-semibold text-[#27314f]">{value}</p>
+        <p className="text-xs font-medium text-foreground-subtle">{label}</p>
+        <p className="truncate text-sm font-semibold text-foreground">{value}</p>
       </div>
     </div>
   );
@@ -904,9 +905,9 @@ function ProfileMetric({ icon: Icon, label, value, tone }: { icon: ElementType; 
 
 function FieldLabel({ label }: { label: string }) {
   return (
-    <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#344054]">
+    <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
       {label}
-      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-[#b7bfd0] text-[10px] text-[#8b92a7]">i</span>
+      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-[#b7bfd0] text-[10px] text-foreground-subtle">i</span>
     </label>
   );
 }
@@ -916,12 +917,12 @@ function SelectField({ label, value, onChange, options, labels = {} }: { label: 
     <div>
       <FieldLabel label={label} />
       <div className="relative">
-        <select value={value} onChange={(event) => onChange(event.target.value)} className="h-11 w-full appearance-none rounded-lg border border-[#dfe4ef] bg-white px-3 pr-9 text-sm text-[#344054] outline-none focus:border-[#6d3df4] focus:ring-2 focus:ring-[#6d3df4]/10">
+        <select value={value} onChange={(event) => onChange(event.target.value)} className="h-11 w-full appearance-none rounded-lg border border-border bg-surface px-3 pr-9 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-ring/10">
           {options.map((option) => (
             <option key={option} value={option}>{labels[option] ?? option}</option>
           ))}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-3 top-3.5 h-4 w-4 text-[#8b92a7]" strokeWidth={1.8} aria-hidden="true" />
+        <ChevronDown className="pointer-events-none absolute right-3 top-3.5 h-4 w-4 text-foreground-subtle" strokeWidth={1.8} aria-hidden="true" />
       </div>
     </div>
   );
@@ -932,18 +933,18 @@ function RangeField({ label, value, min, max, step, left, right, display, onChan
     <div>
       <FieldLabel label={label} />
       <div className="flex h-11 items-center gap-3">
-        <span className="text-xs text-[#667085]">{left}</span>
+        <span className="text-xs text-foreground-muted">{left}</span>
         <input value={value} min={min} max={max} step={step} type="range" onChange={(event) => onChange(Number(event.target.value))} className="h-2 flex-1 accent-[#6d3df4]" />
-        <span className="text-xs text-[#667085]">{right}</span>
+        <span className="text-xs text-foreground-muted">{right}</span>
       </div>
-      <p className="text-center text-xs font-semibold text-[#6d3df4]">{display}</p>
+      <p className="text-center text-xs font-semibold text-primary">{display}</p>
     </div>
   );
 }
 
 function CheckOption({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
   return (
-    <label className="flex items-center gap-2 text-sm font-medium text-[#344054]">
+    <label className="flex items-center gap-2 text-sm font-medium text-foreground">
       <input checked={checked} onChange={(event) => onChange(event.target.checked)} type="checkbox" className="h-4 w-4 rounded border-[#c9d1e4] accent-[#6d3df4]" />
       {label}
     </label>
@@ -952,9 +953,9 @@ function CheckOption({ label, checked, onChange }: { label: string; checked: boo
 
 function SidePanel({ title, icon: Icon, tone, action, children }: { title: string; icon: ElementType; tone: "purple" | "amber" | "green"; action?: React.ReactNode; children: React.ReactNode }) {
   const tones = {
-    purple: "border-[#eadfff] bg-[#fbf9ff] text-[#6d3df4]",
-    amber: "border-amber-100 bg-amber-50 text-amber-700",
-    green: "border-emerald-100 bg-emerald-50 text-emerald-700"
+    purple: "border-[#eadfff] bg-[#fbf9ff] text-primary",
+    amber: "border-warning/30 bg-warning/10 text-warning",
+    green: "border-success/30 bg-success/10 text-success"
   };
 
   return (
@@ -964,7 +965,7 @@ function SidePanel({ title, icon: Icon, tone, action, children }: { title: strin
           <Icon className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           <h2 className="text-sm font-semibold">{title}</h2>
         </div>
-        {action ? <div className="text-xs font-semibold text-[#6d3df4]">{action}</div> : null}
+        {action ? <div className="text-xs font-semibold text-primary">{action}</div> : null}
       </div>
       {children}
     </section>
@@ -973,10 +974,10 @@ function SidePanel({ title, icon: Icon, tone, action, children }: { title: strin
 
 function TipList({ items }: { items: string[] }) {
   return (
-    <ul className="space-y-3 text-sm font-medium text-[#344054]">
+    <ul className="space-y-3 text-sm font-medium text-foreground">
       {items.map((item) => (
         <li key={item} className="flex items-center gap-2">
-          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={1.8} aria-hidden="true" />
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-success" strokeWidth={1.8} aria-hidden="true" />
           {item}
         </li>
       ))}
@@ -986,12 +987,12 @@ function TipList({ items }: { items: string[] }) {
 
 function DeadlineMini({ item }: { item: { title: string; country: string; deadline?: string | null } }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg bg-white/80 p-3">
+    <div className="flex items-center justify-between gap-3 rounded-lg bg-surface/80 p-3">
       <div className="min-w-0">
-        <p className="truncate text-sm font-semibold text-[#344054]">{item.title}</p>
-        <p className="mt-1 text-xs text-[#667085]">{item.country}</p>
+        <p className="truncate text-sm font-semibold text-foreground">{item.title}</p>
+        <p className="mt-1 text-xs text-foreground-muted">{item.country}</p>
       </div>
-      <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg border border-[#ead6a8] bg-white text-amber-700">
+      <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg border border-[#ead6a8] bg-surface text-warning">
         <span className="text-sm font-semibold">{formatDay(item.deadline)}</span>
         <span className="text-[10px] font-semibold uppercase">{formatMonth(item.deadline)}</span>
       </div>
@@ -1001,28 +1002,28 @@ function DeadlineMini({ item }: { item: { title: string; country: string; deadli
 
 function PopularMini({ scholarship }: { scholarship: Scholarship }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg bg-white/80 p-3">
+    <div className="flex items-center gap-3 rounded-lg bg-surface/80 p-3">
       <ScholarshipLogo scholarship={scholarship} small />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-[#344054]">{scholarship.name}</p>
-        <p className="mt-1 text-xs text-[#667085]">{scholarship.country?.name ?? "Scholarship"} / {shortDegree(scholarship.degreeLevel)}</p>
-        <span className="mt-1 inline-flex rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">{scholarship.amountUsd ? `USD ${formatNumber(scholarship.amountUsd)}` : "Funding"}</span>
+        <p className="truncate text-sm font-semibold text-foreground">{scholarship.name}</p>
+        <p className="mt-1 text-xs text-foreground-muted">{scholarship.country?.name ?? "Scholarship"} / {shortDegree(scholarship.degreeLevel)}</p>
+        <span className="mt-1 inline-flex rounded-md bg-success/10 px-2 py-0.5 text-xs font-semibold text-success">{scholarship.amountUsd ? `USD ${formatNumber(scholarship.amountUsd)}` : "Funding"}</span>
       </div>
-      <Bookmark className="h-4 w-4 text-[#667085]" strokeWidth={1.8} aria-hidden="true" />
+      <Bookmark className="h-4 w-4 text-foreground-muted" strokeWidth={1.8} aria-hidden="true" />
     </div>
   );
 }
 
 function ResultStat({ icon: Icon, value, label, detail, tone, active, onClick }: { icon: ElementType; value: number; label: string; detail: string; tone: "green" | "amber" | "red" | "purple"; active: boolean; onClick: () => void }) {
   const tones = {
-    green: "border-emerald-100 bg-emerald-50 text-emerald-700",
-    amber: "border-amber-100 bg-amber-50 text-amber-700",
-    red: "border-red-100 bg-red-50 text-red-700",
-    purple: "border-[#e5dcff] bg-[#f4f1ff] text-[#6d3df4]"
+    green: "border-success/30 bg-success/10 text-success",
+    amber: "border-warning/30 bg-warning/10 text-warning",
+    red: "border-danger/30 bg-danger/10 text-danger",
+    purple: "border-[#e5dcff] bg-primary/10 text-primary"
   };
 
   return (
-    <button type="button" onClick={onClick} className={`rounded-xl border p-4 text-left shadow-sm transition ${active ? tones[tone] : "border-[#e6e9f2] bg-white text-[#344054] hover:bg-[#f8f8fb]"}`}>
+    <button type="button" onClick={onClick} className={`rounded-xl border p-4 text-left shadow-sm transition ${active ? tones[tone] : "border-border bg-surface text-foreground hover:bg-surface-muted"}`}>
       <div className="flex items-center gap-3">
         <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${tones[tone]}`}>
           <Icon className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
@@ -1032,16 +1033,16 @@ function ResultStat({ icon: Icon, value, label, detail, tone, active, onClick }:
           <p className="text-sm font-semibold">{label}</p>
         </div>
       </div>
-      <p className="mt-2 text-xs text-[#667085]">{detail}</p>
+      <p className="mt-2 text-xs text-foreground-muted">{detail}</p>
     </button>
   );
 }
 
 function SelectInline({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: Array<[string, string]> }) {
   return (
-    <label className="flex items-center gap-3 text-sm font-semibold text-[#344054]">
+    <label className="flex items-center gap-3 text-sm font-semibold text-foreground">
       {label}
-      <select value={value} onChange={(event) => onChange(event.target.value)} className="h-10 rounded-lg border border-[#dfe4ef] bg-white px-3 text-sm font-medium text-[#344054] outline-none focus:border-[#6d3df4]">
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="h-10 rounded-lg border border-border bg-surface px-3 text-sm font-medium text-foreground outline-none focus:border-primary">
         {options.map(([optionValue, optionLabel]) => (
           <option key={optionValue} value={optionValue}>{optionLabel}</option>
         ))}
@@ -1053,11 +1054,11 @@ function SelectInline({ label, value, onChange, options }: { label: string; valu
 function MiniMeta({ icon: Icon, label, value }: { icon: ElementType; label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <p className="flex items-center gap-1 text-[11px] font-medium text-[#8b92a7]">
+      <p className="flex items-center gap-1 text-[11px] font-medium text-foreground-subtle">
         <Icon className="h-3.5 w-3.5" strokeWidth={1.8} aria-hidden="true" />
         {label}
       </p>
-      <p className="mt-1 truncate font-semibold text-[#344054]">{value}</p>
+      <p className="mt-1 truncate font-semibold text-foreground">{value}</p>
     </div>
   );
 }
@@ -1171,18 +1172,18 @@ function matchesMoreFilters(scholarship: Scholarship, filters: MoreFilters) {
 function getStatusTone(status: ScholarshipMatch["status"]) {
   if (status === "ELIGIBLE") {
     return {
-      badge: "bg-emerald-50 text-emerald-700"
+      badge: "bg-success/10 text-success"
     };
   }
 
   if (status === "ALMOST_ELIGIBLE") {
     return {
-      badge: "bg-amber-50 text-amber-700"
+      badge: "bg-warning/10 text-warning"
     };
   }
 
   return {
-    badge: "bg-red-50 text-red-700"
+    badge: "bg-danger/10 text-danger"
   };
 }
 
@@ -1209,7 +1210,7 @@ function getLogoTone(value: string) {
     return "bg-[#b91c1c] text-white";
   }
 
-  return "bg-[#f0eaff] text-[#6d3df4]";
+  return "bg-primary/10 text-primary";
 }
 
 function friendlyNationality(value: string) {

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../api/client";
+import { PageLoader } from "../components/ui/Skeleton";
 import { useAuth } from "../state/AuthContext";
 import type {
   ApplicationRiskTolerance,
@@ -221,20 +222,20 @@ export function ApplicationStrategyPage() {
   }
 
   if (loading) {
-    return <div className="text-sm font-medium text-[#667085]">Loading application strategy</div>;
+    return <div className="mx-auto max-w-5xl"><PageLoader label="Loading application strategy" /></div>;
   }
 
   return (
     <div className="mx-auto max-w-[1180px]">
-      <section className="mb-5 rounded-lg border border-[#e6e9f2] bg-white p-6 shadow-sm">
+      <section className="mb-5 rounded-lg border border-border bg-surface p-6 shadow-sm">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#edf7f2] text-[#2f6f5e]">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <ClipboardList className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
             </span>
             <div>
-              <h1 className="text-2xl font-semibold text-[#151b2d]">Application Strategy Builder</h1>
-              <p className="mt-2 text-sm leading-6 text-[#667085]">
+              <h1 className="font-display text-2xl font-[560] tracking-[-0.01em] text-foreground">Application Strategy Builder</h1>
+              <p className="mt-2 text-sm leading-6 text-foreground-muted">
                 Build a balanced application list from your Safe, Target, and Reach university matches.
               </p>
             </div>
@@ -243,7 +244,7 @@ export function ApplicationStrategyPage() {
             type="button"
             onClick={() => generatePlan()}
             disabled={generating || countError}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#2f6f5e] px-5 text-sm font-medium text-white hover:bg-[#285f51] disabled:opacity-60"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-white hover:bg-primary disabled:opacity-60"
           >
             <RefreshCw className={`h-4 w-4 ${generating ? "animate-spin" : ""}`} strokeWidth={1.8} aria-hidden="true" />
             <span>{generating ? "Building" : "Build strategy"}</span>
@@ -252,7 +253,7 @@ export function ApplicationStrategyPage() {
       </section>
 
       {error ? (
-        <div className="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+        <div className="mb-5 rounded-lg border border-danger/30 bg-danger/10 p-4 text-sm text-danger">
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
             <div>
@@ -267,30 +268,30 @@ export function ApplicationStrategyPage() {
       ) : null}
 
       {message ? (
-        <div className="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-700">
+        <div className="mb-5 rounded-lg border border-success/30 bg-success/10 p-4 text-sm font-medium text-success">
           {message}
         </div>
       ) : null}
 
-      <section className="mb-5 rounded-lg border border-[#e6e9f2] bg-white p-5 shadow-sm">
-        <div className="mb-5 flex items-center gap-2 text-sm font-medium text-[#344054]">
+      <section className="mb-5 rounded-lg border border-border bg-surface p-5 shadow-sm">
+        <div className="mb-5 flex items-center gap-2 text-sm font-medium text-foreground">
           <SlidersHorizontal className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           <span>Strategy settings</span>
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
           <div>
-            <p className="mb-2 text-sm font-medium text-[#344054]">Risk posture</p>
+            <p className="mb-2 text-sm font-medium text-foreground">Risk posture</p>
             <div className="grid gap-2 md:grid-cols-3">
               {riskOptions.map((option) => (
                 <button
                   key={option.value}
                   type="button"
                   onClick={() => handleRiskChange(option.value)}
-                  className={`min-h-[86px] rounded-lg border p-3 text-left transition ${riskTolerance === option.value ? "border-[#2f6f5e] bg-[#edf7f2]" : "border-[#dfe4ef] bg-white hover:bg-[#f8f9fc]"}`}
+                  className={`min-h-[86px] rounded-lg border p-3 text-left transition ${riskTolerance === option.value ? "border-primary bg-primary/10" : "border-border bg-surface hover:bg-surface-muted"}`}
                 >
-                  <span className={`block text-sm font-semibold ${riskTolerance === option.value ? "text-[#2f6f5e]" : "text-[#344054]"}`}>{option.label}</span>
-                  <span className="mt-1 block text-xs leading-5 text-[#667085]">{option.description}</span>
+                  <span className={`block text-sm font-semibold ${riskTolerance === option.value ? "text-primary" : "text-foreground"}`}>{option.label}</span>
+                  <span className="mt-1 block text-xs leading-5 text-foreground-muted">{option.description}</span>
                 </button>
               ))}
             </div>
@@ -316,7 +317,7 @@ export function ApplicationStrategyPage() {
         </div>
 
         {countError ? (
-          <p className="mt-4 text-sm font-medium text-red-700">Choose between 3 and 15 total applications.</p>
+          <p className="mt-4 text-sm font-medium text-danger">Choose between 3 and 15 total applications.</p>
         ) : null}
       </section>
 
@@ -329,15 +330,15 @@ export function ApplicationStrategyPage() {
             <Metric label="Reach" value={plan.reachCount.toString()} icon={TrendingUp} tone="reach" />
           </section>
 
-          <section className="mb-5 rounded-lg border border-[#e6e9f2] bg-white p-5 shadow-sm">
+          <section className="mb-5 rounded-lg border border-border bg-surface p-5 shadow-sm">
             <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div>
-                <p className="text-sm font-semibold text-[#151b2d]">{plan.summary}</p>
-                <p className="mt-1 text-sm text-[#667085]">Generated {formatDate(plan.createdAt)} using a {formatRisk(plan.riskTolerance)} strategy.</p>
+                <p className="text-sm font-semibold text-foreground">{plan.summary}</p>
+                <p className="mt-1 text-sm text-foreground-muted">Generated {formatDate(plan.createdAt)} using a {formatRisk(plan.riskTolerance)} strategy.</p>
               </div>
               <Link
                 to="/matches"
-                className="inline-flex h-10 items-center justify-center rounded-lg border border-[#dfe4ef] px-4 text-sm font-medium text-[#344054] hover:bg-[#f8f9fc]"
+                className="inline-flex h-10 items-center justify-center rounded-lg border border-border px-4 text-sm font-medium text-foreground hover:bg-surface-muted"
               >
                 Review matches
               </Link>
@@ -345,12 +346,12 @@ export function ApplicationStrategyPage() {
           </section>
 
           {plan.warnings.length ? (
-            <section className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-4">
-              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-amber-800">
+            <section className="mb-5 rounded-lg border border-warning/30 bg-warning/10 p-4">
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-warning">
                 <AlertTriangle className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
                 <span>Risk notes</span>
               </div>
-              <ul className="grid gap-2 text-sm leading-6 text-amber-800 md:grid-cols-2">
+              <ul className="grid gap-2 text-sm leading-6 text-warning md:grid-cols-2">
                 {plan.warnings.map((warning) => (
                   <li key={warning} className="flex gap-2">
                     <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-700" />
@@ -375,17 +376,17 @@ export function ApplicationStrategyPage() {
           </section>
         </>
       ) : (
-        <section className="rounded-lg border border-dashed border-[#d6dbe8] bg-white p-8 text-center">
-          <ClipboardList className="mx-auto h-8 w-8 text-[#2f6f5e]" strokeWidth={1.8} aria-hidden="true" />
-          <h2 className="mt-4 text-lg font-semibold text-[#151b2d]">No strategy plan yet</h2>
-          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#667085]">
+        <section className="rounded-lg border border-dashed border-border bg-surface p-8 text-center">
+          <ClipboardList className="mx-auto h-8 w-8 text-primary" strokeWidth={1.8} aria-hidden="true" />
+          <h2 className="mt-4 text-lg font-semibold text-foreground">No strategy plan yet</h2>
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-foreground-muted">
             Generate university matches first, then build a balanced application strategy from them.
           </p>
           <button
             type="button"
             onClick={() => generatePlan()}
             disabled={generating || countError}
-            className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#2f6f5e] px-5 text-sm font-medium text-white hover:bg-[#285f51] disabled:opacity-60"
+            className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-white hover:bg-primary disabled:opacity-60"
           >
             <RefreshCw className={`h-4 w-4 ${generating ? "animate-spin" : ""}`} strokeWidth={1.8} aria-hidden="true" />
             <span>{generating ? "Building" : "Build strategy"}</span>
@@ -415,8 +416,8 @@ function StrategyColumn({
     <div>
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-[#151b2d]">{formatCategory(category)}</h2>
-          <p className="mt-1 text-xs font-medium text-[#667085]">{items.length} selected, {desiredCount} requested</p>
+          <h2 className="text-base font-semibold text-foreground">{formatCategory(category)}</h2>
+          <p className="mt-1 text-xs font-medium text-foreground-muted">{items.length} selected, {desiredCount} requested</p>
         </div>
         <span className={`rounded-md px-2.5 py-1 text-xs font-semibold ${tone.badge}`}>{formatCategory(category)}</span>
       </div>
@@ -433,7 +434,7 @@ function StrategyColumn({
           ))}
         </div>
       ) : (
-        <div className="rounded-lg border border-dashed border-[#d6dbe8] bg-white p-5 text-sm leading-6 text-[#667085]">
+        <div className="rounded-lg border border-dashed border-border bg-surface p-5 text-sm leading-6 text-foreground-muted">
           No {formatCategory(category).toLowerCase()} programs were selected for this plan.
         </div>
       )}
@@ -454,15 +455,15 @@ function StrategyItemCard({
   const program = item.program;
 
   return (
-    <article className="rounded-lg border border-[#e6e9f2] bg-white p-4 shadow-sm">
+    <article className="rounded-lg border border-border bg-surface p-4 shadow-sm">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span className={`rounded-md px-2 py-1 text-xs font-semibold ${tone.badge}`}>#{item.rank}</span>
-            <span className="rounded-md bg-[#f6f7fb] px-2 py-1 text-xs font-medium text-[#667085]">{program.university.rankingBand}</span>
+            <span className="rounded-md bg-surface-muted px-2 py-1 text-xs font-medium text-foreground-muted">{program.university.rankingBand}</span>
           </div>
-          <h3 className="text-sm font-semibold leading-5 text-[#151b2d]">{program.title}</h3>
-          <p className="mt-1 text-xs leading-5 text-[#667085]">
+          <h3 className="text-sm font-semibold leading-5 text-foreground">{program.title}</h3>
+          <p className="mt-1 text-xs leading-5 text-foreground-muted">
             {program.university.name}, {program.university.country.name}
           </p>
         </div>
@@ -471,7 +472,7 @@ function StrategyItemCard({
           onClick={() => onToggleLock(item)}
           disabled={updating}
           title={item.isLocked ? "Unlock recommendation" : "Lock recommendation"}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#dfe4ef] text-[#344054] hover:bg-[#f8f9fc] disabled:opacity-60"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border text-foreground hover:bg-surface-muted disabled:opacity-60"
         >
           {item.isLocked ? (
             <Lock className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
@@ -481,17 +482,17 @@ function StrategyItemCard({
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 text-xs text-[#344054]">
+      <div className="grid grid-cols-2 gap-3 text-xs text-foreground">
         <Info label="Match score" value={`${item.score}/100`} />
         <Info label="Tuition" value={`USD ${formatNumber(program.tuitionUsd)}`} />
         <Info label="Deadline" value={program.deadline ? formatDate(program.deadline) : "Not listed"} />
         <Info label="Min CGPA" value={program.minCgpa.toFixed(2)} />
       </div>
 
-      <ul className="mt-4 grid gap-2 text-xs leading-5 text-[#667085]">
+      <ul className="mt-4 grid gap-2 text-xs leading-5 text-foreground-muted">
         {item.rationale.slice(0, 4).map((reason) => (
           <li key={reason} className="flex gap-2">
-            <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#2f6f5e]" strokeWidth={1.8} aria-hidden="true" />
+            <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={1.8} aria-hidden="true" />
             <span>{reason}</span>
           </li>
         ))}
@@ -512,18 +513,18 @@ function Metric({
   tone?: "neutral" | "safe" | "target" | "reach";
 }) {
   const toneClass = {
-    neutral: "bg-[#f6f7fb] text-[#344054]",
-    safe: "bg-emerald-50 text-emerald-700",
-    target: "bg-blue-50 text-blue-700",
-    reach: "bg-amber-50 text-amber-700"
+    neutral: "bg-surface-muted text-foreground",
+    safe: "bg-success/10 text-success",
+    target: "bg-info/10 text-info",
+    reach: "bg-warning/10 text-warning"
   }[tone];
 
   return (
-    <article className="rounded-lg border border-[#e6e9f2] bg-white p-4 shadow-sm">
+    <article className="rounded-lg border border-border bg-surface p-4 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-medium text-[#667085]">{label}</p>
-          <p className="mt-1 text-2xl font-semibold text-[#151b2d]">{value}</p>
+          <p className="text-xs font-medium text-foreground-muted">{label}</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{value}</p>
         </div>
         <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${toneClass}`}>
           <Icon className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
@@ -548,14 +549,14 @@ function NumberInput({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-medium text-[#344054]">{label}</span>
+      <span className="mb-2 block text-sm font-medium text-foreground">{label}</span>
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
         type="number"
         min={min}
         max={max}
-        className="h-11 w-full rounded-lg border border-[#dfe4ef] bg-white px-3 text-sm font-normal text-[#344054] outline-none transition focus:border-[#2f6f5e] focus:ring-2 focus:ring-[#2f6f5e]/10"
+        className="h-11 w-full rounded-lg border border-border bg-surface px-3 text-sm font-normal text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-[#2f6f5e]/10"
       />
     </label>
   );
@@ -564,8 +565,8 @@ function NumberInput({
 function Info({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="font-medium text-[#8b92a7]">{label}</p>
-      <p className="mt-1 font-semibold text-[#27314f]">{value}</p>
+      <p className="font-medium text-foreground-subtle">{label}</p>
+      <p className="mt-1 font-semibold text-foreground">{value}</p>
     </div>
   );
 }
@@ -646,18 +647,18 @@ function sumCounts(counts: Array<{ count: number }>) {
 function getCategoryTone(category: StrategyCategory) {
   if (category === "SAFE") {
     return {
-      badge: "bg-emerald-50 text-emerald-700"
+      badge: "bg-success/10 text-success"
     };
   }
 
   if (category === "TARGET") {
     return {
-      badge: "bg-blue-50 text-blue-700"
+      badge: "bg-info/10 text-info"
     };
   }
 
   return {
-    badge: "bg-amber-50 text-amber-700"
+    badge: "bg-warning/10 text-warning"
   };
 }
 

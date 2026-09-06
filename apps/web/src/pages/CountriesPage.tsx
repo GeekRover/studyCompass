@@ -338,18 +338,18 @@ export function CountriesPage() {
   return (
     <div className="mx-auto max-w-[1220px]">
       {error ? (
-        <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div className="mb-4 flex items-center justify-between rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm font-medium text-danger">
           <span>{error}</span>
-          <button type="button" onClick={() => setError("")} className="text-red-700">
+          <button type="button" onClick={() => setError("")} className="text-danger">
             <X className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           </button>
         </div>
       ) : null}
 
       {statusMessage ? (
-        <div className="mb-4 flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+        <div className="mb-4 flex items-center justify-between rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm font-medium text-success">
           <span>{statusMessage}</span>
-          <button type="button" onClick={() => setStatusMessage("")} className="text-emerald-700">
+          <button type="button" onClick={() => setStatusMessage("")} className="text-success">
             <X className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           </button>
         </div>
@@ -493,19 +493,19 @@ function ExplorerView({
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
       <div className="space-y-5">
-        <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
+        <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-semibold text-[#111827]">Country Explorer</h1>
+                <h1 className="font-display text-2xl font-[560] tracking-[-0.01em] text-foreground">Country Explorer</h1>
                 <StepBadge label="Step 1 of 4" />
               </div>
-              <p className="mt-1 text-sm text-[#667085]">Explore and select countries to compare based on your study and career priorities.</p>
+              <p className="mt-1 text-sm text-foreground-muted">Explore and select countries to compare based on your study and career priorities.</p>
             </div>
             <button
               type="button"
               onClick={() => onSetAdvancedOpen(!advancedOpen)}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-white px-4 text-sm font-semibold text-[#5f3bd7] hover:bg-[#f7f5ff]"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface px-4 text-sm font-semibold text-primary hover:bg-surface-muted"
             >
               <Eye className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               How it works
@@ -521,26 +521,26 @@ function ExplorerView({
           <StatTile icon={Globe2} label={`${stats?.dataFreshness ?? "Monthly"} data`} value="Updated" accent="pink" />
         </section>
 
-        <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
+        <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f3efff] text-[#6d3df4]">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Filter className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </span>
-              <h2 className="text-base font-semibold text-[#182033]">Filter countries</h2>
+              <h2 className="text-base font-semibold text-foreground">Filter countries</h2>
             </div>
-            <button type="button" onClick={onResetFilters} className="text-sm font-semibold text-[#6d3df4] hover:text-[#4f2fca]">
+            <button type="button" onClick={onResetFilters} className="text-sm font-semibold text-primary hover:text-primary">
               Clear all
             </button>
           </div>
 
-          <div className="mb-4 flex h-11 items-center gap-2 rounded-lg border border-[#dce3f0] bg-white px-3">
+          <div className="mb-4 flex h-11 items-center gap-2 rounded-lg border border-border bg-surface px-3">
             <Search className="h-4 w-4 text-[#8b95aa]" strokeWidth={1.8} aria-hidden="true" />
             <input
               value={filters.search}
               onChange={(event) => onUpdateFilter("search", event.target.value)}
               placeholder="Search countries, cities, visa paths..."
-              className="w-full border-0 bg-transparent text-sm text-[#27314f] outline-none placeholder:text-[#98a2b3]"
+              className="w-full border-0 bg-transparent text-sm text-foreground outline-none placeholder:text-foreground-subtle"
             />
           </div>
 
@@ -587,7 +587,7 @@ function ExplorerView({
             <button
               type="button"
               onClick={() => onSetAdvancedOpen(!advancedOpen)}
-              className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-white px-4 text-sm font-semibold text-[#5f3bd7] hover:bg-[#f7f5ff]"
+              className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface px-4 text-sm font-semibold text-primary hover:bg-surface-muted"
             >
               <SlidersHorizontal className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Advanced filters
@@ -595,7 +595,7 @@ function ExplorerView({
           </div>
 
           {advancedOpen ? (
-            <div className="mt-4 grid gap-3 border-t border-[#edf0f6] pt-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-2 lg:grid-cols-4">
               <CheckFilter label="Fully funded scholarships" checked={filters.fullyFunded} onChange={(checked) => onUpdateFilter("fullyFunded", checked)} />
               <CheckFilter label="English-friendly" checked={filters.englishFriendly} onChange={(checked) => onUpdateFilter("englishFriendly", checked)} />
               <CheckFilter label="Lower visa difficulty" checked={filters.lowVisaDifficulty} onChange={(checked) => onUpdateFilter("lowVisaDifficulty", checked)} />
@@ -606,8 +606,8 @@ function ExplorerView({
 
         <section>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-[#182033]">Popular countries</h2>
-            <span className="text-sm font-semibold text-[#6d3df4]">{filteredCountries.length} shown</span>
+            <h2 className="text-base font-semibold text-foreground">Popular countries</h2>
+            <span className="text-sm font-semibold text-primary">{filteredCountries.length} shown</span>
           </div>
 
           {filteredCountries.length ? (
@@ -687,29 +687,29 @@ function CompareView({
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
       <div className="space-y-5">
-        <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
+        <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <button type="button" onClick={onBack} className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-[#5f3bd7]">
+              <button type="button" onClick={onBack} className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-primary">
                 <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
                 Back to Country Explorer
               </button>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-semibold text-[#111827]">Country Comparison Dashboard</h1>
+                <h1 className="font-display text-2xl font-[560] tracking-[-0.01em] text-foreground">Country Comparison Dashboard</h1>
                 <StepBadge label="Step 2 of 4" />
               </div>
-              <p className="mt-1 text-sm text-[#667085]">Compare key factors side by side to choose the best study destination.</p>
+              <p className="mt-1 text-sm text-foreground-muted">Compare key factors side by side to choose the best study destination.</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={onSaveComparison} className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#dce3f0] bg-white px-4 text-sm font-semibold text-[#344054] hover:bg-[#f8fafc]">
+              <button type="button" onClick={onSaveComparison} className="inline-flex h-10 items-center gap-2 rounded-lg border border-border bg-surface px-4 text-sm font-semibold text-foreground hover:bg-surface-muted">
                 <Bookmark className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
                 Save comparison
               </button>
-              <button type="button" onClick={onShareComparison} className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#dce3f0] bg-white px-4 text-sm font-semibold text-[#344054] hover:bg-[#f8fafc]">
+              <button type="button" onClick={onShareComparison} className="inline-flex h-10 items-center gap-2 rounded-lg border border-border bg-surface px-4 text-sm font-semibold text-foreground hover:bg-surface-muted">
                 <Share2 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
                 Share
               </button>
-              <button type="button" onClick={onSummary} className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#5f3bd7] px-4 text-sm font-semibold text-white shadow-sm hover:bg-[#4f2fca]">
+              <button type="button" onClick={onSummary} className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-sm hover:bg-primary">
                 Next: View Insights
                 <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </button>
@@ -717,11 +717,11 @@ function CompareView({
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
+        <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-base font-semibold text-[#182033]">Comparing {countries.length} countries</h2>
-              <p className="mt-1 text-sm text-[#667085]">You can compare up to 4 countries at a time.</p>
+              <h2 className="text-base font-semibold text-foreground">Comparing {countries.length} countries</h2>
+              <p className="mt-1 text-sm text-foreground-muted">You can compare up to 4 countries at a time.</p>
             </div>
             <div className="flex gap-2">
               <select
@@ -730,14 +730,14 @@ function CompareView({
                   onSetCountryToAdd(event.target.value);
                   onAddCountry(event.target.value);
                 }}
-                className="h-10 rounded-lg border border-[#dce3f0] bg-white px-3 text-sm font-medium text-[#27314f] outline-none"
+                className="h-10 rounded-lg border border-border bg-surface px-3 text-sm font-medium text-foreground outline-none"
               >
                 <option value="">Add country</option>
                 {allCountries.filter((country) => !selectedIds.includes(country.id)).map((country) => (
                   <option key={country.id} value={country.id}>{country.name}</option>
                 ))}
               </select>
-              <button type="button" onClick={onCompare} disabled={comparing} className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#cfc7ff] bg-white px-4 text-sm font-semibold text-[#5f3bd7] hover:bg-[#f7f5ff] disabled:cursor-not-allowed disabled:opacity-60">
+              <button type="button" onClick={onCompare} disabled={comparing} className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface px-4 text-sm font-semibold text-primary hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-60">
                 <RefreshCw className={`h-4 w-4 ${comparing ? "animate-spin" : ""}`} strokeWidth={1.8} aria-hidden="true" />
                 Refresh
               </button>
@@ -746,17 +746,17 @@ function CompareView({
 
           <div className="grid gap-3 md:grid-cols-3">
             {countries.map((country, index) => (
-              <div key={country.id} className="flex items-center justify-between rounded-lg border border-[#e7eaf3] bg-[#fbfcff] px-4 py-3">
+              <div key={country.id} className="flex items-center justify-between rounded-lg border border-border bg-[#fbfcff] px-4 py-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <FlagMark countryName={country.name} />
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-[#182033]">{country.name}</p>
-                    <p className="text-xs font-medium text-[#7a8194]">{country.meta?.region ?? "Global"}</p>
+                    <p className="truncate text-sm font-semibold text-foreground">{country.name}</p>
+                    <p className="text-xs font-medium text-foreground-subtle">{country.meta?.region ?? "Global"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="rounded-full bg-[#eef8f2] px-2 py-1 text-[11px] font-semibold text-[#12805c]">{index === 0 ? "Top match" : `${scoreOf(country)}/100`}</span>
-                  <button type="button" onClick={() => onToggleCountry(country.id)} title={`Remove ${country.name}`} className="text-[#8b95aa] hover:text-[#344054]">
+                  <button type="button" onClick={() => onToggleCountry(country.id)} title={`Remove ${country.name}`} className="text-[#8b95aa] hover:text-foreground">
                     <X className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
                   </button>
                 </div>
@@ -765,10 +765,10 @@ function CompareView({
           </div>
         </section>
 
-        <section className="overflow-hidden rounded-xl border border-[#e3e8f4] bg-white shadow-sm">
+        <section className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[860px] text-left text-sm">
-              <thead className="bg-[#f8f9fc] text-xs font-semibold uppercase text-[#667085]">
+              <thead className="bg-surface-muted text-xs font-semibold uppercase text-foreground-muted">
                 <tr>
                   <th className="w-[240px] px-4 py-3">Criteria</th>
                   {countries.map((country) => (
@@ -781,7 +781,7 @@ function CompareView({
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#edf0f6]">
+              <tbody className="divide-y divide-border">
                 <CompareRow icon={Target} label="Overall suitability score" countries={countries} render={(country) => (
                   <span className="font-semibold text-[#15803d]">{scoreOf(country)} / 100</span>
                 )} />
@@ -802,7 +802,7 @@ function CompareView({
           </div>
         </section>
 
-        <section className="grid gap-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4 md:grid-cols-3">
+        <section className="grid gap-4 rounded-xl border border-success/30 bg-success/10 p-4 md:grid-cols-3">
           <RecommendationTile icon={PiggyBank} label="Best budget option" value={recommendations?.bestBudget ?? countries[0]?.name ?? "-"} />
           <RecommendationTile icon={BriefcaseBusiness} label="Best career option" value={recommendations?.bestCareer ?? countries[0]?.name ?? "-"} />
           <RecommendationTile icon={GraduationCap} label="Best scholarship option" value={recommendations?.bestScholarships ?? countries[0]?.name ?? "-"} />
@@ -810,15 +810,15 @@ function CompareView({
 
         <section className="grid gap-4 md:grid-cols-2">
           {countries.map((country) => (
-            <article key={country.id} className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
+            <article key={country.id} className="rounded-xl border border-border bg-surface p-5 shadow-sm">
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-[#182033]">{country.name}</p>
-                  <p className="mt-1 text-sm text-[#667085]">{country.decision?.recommendation}</p>
+                  <p className="text-sm font-semibold text-foreground">{country.name}</p>
+                  <p className="mt-1 text-sm text-foreground-muted">{country.decision?.recommendation}</p>
                 </div>
                 <ScoreRing score={scoreOf(country)} size="sm" />
               </div>
-              <button type="button" onClick={() => onOpenDetail(country)} className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-white text-sm font-semibold text-[#5f3bd7] hover:bg-[#f7f5ff]">
+              <button type="button" onClick={() => onOpenDetail(country)} className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface text-sm font-semibold text-primary hover:bg-surface-muted">
                 View country details
                 <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </button>
@@ -862,12 +862,12 @@ function DetailView({
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
       <div className="space-y-5">
-        <section className="overflow-hidden rounded-xl border border-[#e3e8f4] bg-white shadow-sm">
+        <section className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
           <div className="relative">
             <div className="absolute inset-0 opacity-20" style={{ background: getCountryTheme(country.name) }} />
             <div className="relative grid gap-6 bg-gradient-to-r from-white via-white/95 to-white/80 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_220px]">
               <div>
-                <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-[#5f3bd7]">
+                <button type="button" onClick={onBack} className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-primary">
                   <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
                   Back to comparison
                 </button>
@@ -875,26 +875,26 @@ function DetailView({
                   <FlagPoster countryName={country.name} />
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h1 className="text-3xl font-semibold tracking-normal text-[#111827]">{country.name}</h1>
-                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#5f3bd7] shadow-sm">{country.meta?.region ?? "Global"}</span>
+                      <h1 className="font-display text-3xl font-[560] tracking-[-0.02em] text-foreground">{country.name}</h1>
+                      <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-primary shadow-sm">{country.meta?.region ?? "Global"}</span>
                     </div>
-                    <p className="mt-2 text-sm font-semibold text-[#344054]">Study, work, and settlement overview</p>
+                    <p className="mt-2 text-sm font-semibold text-foreground">Study, work, and settlement overview</p>
                     <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5c667a]">{country.notes ?? country.meta?.insight}</p>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {country.meta?.highlights.slice(0, 3).map((highlight) => (
-                        <span key={highlight} className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#5f3bd7] shadow-sm">{highlight}</span>
+                        <span key={highlight} className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-primary shadow-sm">{highlight}</span>
                       ))}
                     </div>
                     <div className="mt-5 flex flex-wrap gap-3">
-                      <button type="button" onClick={onSaveCountry} disabled={saving} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-white px-4 text-sm font-semibold text-[#5f3bd7] hover:bg-[#f7f5ff] disabled:cursor-not-allowed disabled:opacity-60">
+                      <button type="button" onClick={onSaveCountry} disabled={saving} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface px-4 text-sm font-semibold text-primary hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-60">
                         <Heart className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
                         {saving ? "Saving..." : "Save country"}
                       </button>
-                      <button type="button" onClick={() => onToggleCountry(country.id)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#5f3bd7] px-4 text-sm font-semibold text-white shadow-sm hover:bg-[#4f2fca]">
+                      <button type="button" onClick={() => onToggleCountry(country.id)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-white shadow-sm hover:bg-primary">
                         {selected ? <CheckCircle2 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" /> : <Plus className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />}
                         {selected ? "In comparison" : "Add to compare"}
                       </button>
-                      <button type="button" onClick={onViewUniversities} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#dce3f0] bg-white px-4 text-sm font-semibold text-[#344054] hover:bg-[#f8fafc]">
+                      <button type="button" onClick={onViewUniversities} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 text-sm font-semibold text-foreground hover:bg-surface-muted">
                         <Landmark className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
                         View universities
                       </button>
@@ -902,28 +902,28 @@ function DetailView({
                   </div>
                 </div>
               </div>
-              <div className="rounded-xl border border-white/70 bg-white/90 p-4 shadow-sm">
-                <p className="text-sm font-semibold text-[#344054]">Suitability score</p>
+              <div className="rounded-xl border border-white/70 bg-surface/90 p-4 shadow-sm">
+                <p className="text-sm font-semibold text-foreground">Suitability score</p>
                 <div className="mt-4 flex justify-center">
                   <ScoreRing score={scoreOf(country)} size="md" />
                 </div>
                 <div className="mt-4 text-center">
-                  <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">{scoreLabel(scoreOf(country))}</span>
-                  <p className="mt-3 text-xs font-medium leading-5 text-[#667085]">{country.decision?.budgetFit ?? "Profile"} budget fit</p>
+                  <span className="inline-flex rounded-full bg-success/10 px-3 py-1 text-xs font-semibold text-success">{scoreLabel(scoreOf(country))}</span>
+                  <p className="mt-3 text-xs font-medium leading-5 text-foreground-muted">{country.decision?.budgetFit ?? "Profile"} budget fit</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#e3e8f4] bg-white px-3 py-2 shadow-sm">
+        <section className="rounded-xl border border-border bg-surface px-3 py-2 shadow-sm">
           <div className="flex gap-1 overflow-x-auto">
             {detailTabs.map((tab) => (
               <button
                 key={tab}
                 type="button"
                 onClick={() => onSetTab(tab)}
-                className={`h-10 whitespace-nowrap rounded-lg px-3 text-sm font-semibold ${activeTab === tab ? "bg-[#f3efff] text-[#5f3bd7]" : "text-[#667085] hover:bg-[#f8fafc]"}`}
+                className={`h-10 whitespace-nowrap rounded-lg px-3 text-sm font-semibold ${activeTab === tab ? "bg-primary/10 text-primary" : "text-foreground-muted hover:bg-surface-muted"}`}
               >
                 {tab}
               </button>
@@ -935,8 +935,8 @@ function DetailView({
       </div>
 
       <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
-        <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
-          <h2 className="text-base font-semibold text-[#182033]">Quick facts</h2>
+        <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+          <h2 className="text-base font-semibold text-foreground">Quick facts</h2>
           <div className="mt-4 space-y-3">
             <FactRow icon={MapPin} label="Capital" value={country.meta?.capital ?? "-"} />
             <FactRow icon={CircleDollarSign} label="Currency" value={country.meta?.currency ?? "-"} />
@@ -946,8 +946,8 @@ function DetailView({
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
-          <h2 className="text-base font-semibold text-[#182033]">Why students choose {country.name}</h2>
+        <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+          <h2 className="text-base font-semibold text-foreground">Why students choose {country.name}</h2>
           <div className="mt-4 space-y-3">
             {country.meta?.highlights.map((highlight) => (
               <CheckLine key={highlight} text={highlight} />
@@ -955,31 +955,31 @@ function DetailView({
           </div>
         </section>
 
-        <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
-          <h2 className="text-base font-semibold text-[#182033]">Popular universities</h2>
+        <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+          <h2 className="text-base font-semibold text-foreground">Popular universities</h2>
           <div className="mt-4 space-y-3">
             {country.topUniversities?.slice(0, 4).map((university) => (
-              <div key={university.id} className="flex items-center gap-3 rounded-lg border border-[#edf0f6] px-3 py-2">
+              <div key={university.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2">
                 <LogoBox label={university.name} />
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-[#182033]">{university.name}</p>
-                  <p className="text-xs text-[#667085]">{university.city} - {university.rankingBand}</p>
+                  <p className="truncate text-sm font-semibold text-foreground">{university.name}</p>
+                  <p className="text-xs text-foreground-muted">{university.city} - {university.rankingBand}</p>
                 </div>
               </div>
             ))}
           </div>
-          <button type="button" onClick={onViewUniversities} className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-white text-sm font-semibold text-[#5f3bd7] hover:bg-[#f7f5ff]">
+          <button type="button" onClick={onViewUniversities} className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface text-sm font-semibold text-primary hover:bg-surface-muted">
             View universities
             <ArrowRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           </button>
         </section>
 
-        <div className="grid gap-2 rounded-xl border border-[#e3e8f4] bg-white p-4 shadow-sm">
-          <button type="button" onClick={onSaveCountry} disabled={saving} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-white text-sm font-semibold text-[#5f3bd7] hover:bg-[#f7f5ff] disabled:cursor-not-allowed disabled:opacity-60">
+        <div className="grid gap-2 rounded-xl border border-border bg-surface p-4 shadow-sm">
+          <button type="button" onClick={onSaveCountry} disabled={saving} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface text-sm font-semibold text-primary hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-60">
             <Heart className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
             {saving ? "Saving..." : "Save country"}
           </button>
-          <button type="button" onClick={() => onToggleCountry(country.id)} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#5f3bd7] text-sm font-semibold text-white shadow-sm hover:bg-[#4f2fca]">
+          <button type="button" onClick={() => onToggleCountry(country.id)} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-white shadow-sm hover:bg-primary">
             {selected ? <CheckCircle2 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" /> : <Plus className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />}
             {selected ? "In comparison" : "Add to compare"}
           </button>
@@ -1020,20 +1020,20 @@ function SummaryView({
 
   return (
     <div className="space-y-5">
-      <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
+      <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <button type="button" onClick={onBack} className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-[#5f3bd7]">
+            <button type="button" onClick={onBack} className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-primary">
               <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Back to comparison
             </button>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold text-[#111827]">Decision Summary & Recommendation</h1>
+              <h1 className="font-display text-2xl font-[560] tracking-[-0.01em] text-foreground">Decision Summary & Recommendation</h1>
               <StepBadge label="Step 4 of 4" />
             </div>
-            <p className="mt-1 text-sm text-[#667085]">Based on your profile and priorities, here is the recommended country ranking.</p>
+            <p className="mt-1 text-sm text-foreground-muted">Based on your profile and priorities, here is the recommended country ranking.</p>
           </div>
-          <button type="button" onClick={onExport} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-white px-4 text-sm font-semibold text-[#5f3bd7] hover:bg-[#f7f5ff]">
+          <button type="button" onClick={onExport} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface px-4 text-sm font-semibold text-primary hover:bg-surface-muted">
             <Download className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
             Export report
           </button>
@@ -1043,15 +1043,15 @@ function SummaryView({
       <div className="grid gap-5 xl:grid-cols-[240px_minmax(0,1fr)_320px]">
         <aside className="space-y-4">
           <ProfileSummaryPanel profile={profile} profileCompletion={profile ? 90 : 0} compact />
-          <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
+          <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-[#182033]">Your priorities</h2>
-              <button type="button" onClick={onRecalculate} className="text-sm font-semibold text-[#5f3bd7]">Update</button>
+              <h2 className="text-base font-semibold text-foreground">Your priorities</h2>
+              <button type="button" onClick={onRecalculate} className="text-sm font-semibold text-primary">Update</button>
             </div>
             <div className="space-y-4">
               {(Object.keys(priorityLabels) as PriorityKey[]).map((key) => (
                 <label key={key} className="block">
-                  <div className="mb-2 flex items-center justify-between text-xs font-semibold text-[#667085]">
+                  <div className="mb-2 flex items-center justify-between text-xs font-semibold text-foreground-muted">
                     <span>{priorityLabels[key]}</span>
                     <span>{priorities[key]}%</span>
                   </div>
@@ -1067,35 +1067,35 @@ function SummaryView({
               ))}
             </div>
           </section>
-          <section className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+          <section className="rounded-xl border border-success/30 bg-success/10 p-4">
             <div className="flex gap-3">
-              <Lightbulb className="h-5 w-5 text-emerald-600" strokeWidth={1.8} aria-hidden="true" />
-              <p className="text-sm font-medium leading-6 text-emerald-800">Changing priorities recalculates the ranking using affordability, work, scholarships, visa, and career fit.</p>
+              <Lightbulb className="h-5 w-5 text-success" strokeWidth={1.8} aria-hidden="true" />
+              <p className="text-sm font-medium leading-6 text-success">Changing priorities recalculates the ranking using affordability, work, scholarships, visa, and career fit.</p>
             </div>
           </section>
         </aside>
 
         <section className="space-y-4">
-          <div className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
-            <h2 className="text-base font-semibold text-[#182033]">Recommended country ranking</h2>
+          <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+            <h2 className="text-base font-semibold text-foreground">Recommended country ranking</h2>
             <div className="mt-4 space-y-4">
               {countries.map((country, index) => (
-                <article key={country.id} className="rounded-xl border border-[#edf0f6] bg-white p-4">
+                <article key={country.id} className="rounded-xl border border-border bg-surface p-4">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex gap-4">
                       <RankBadge rank={index + 1} />
                       <FlagMark countryName={country.name} />
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-lg font-semibold text-[#182033]">{country.name}</h3>
-                          <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">{index === 0 ? "Best overall match" : scoreLabel(scoreOf(country))}</span>
+                          <h3 className="text-lg font-semibold text-foreground">{country.name}</h3>
+                          <span className="rounded-full bg-success/10 px-2 py-1 text-xs font-semibold text-success">{index === 0 ? "Best overall match" : scoreLabel(scoreOf(country))}</span>
                         </div>
-                        <p className="mt-1 max-w-xl text-sm leading-6 text-[#667085]">{country.decision?.recommendation}</p>
+                        <p className="mt-1 max-w-xl text-sm leading-6 text-foreground-muted">{country.decision?.recommendation}</p>
                       </div>
                     </div>
                     <ScoreRing score={scoreOf(country)} size="md" />
                   </div>
-                  <div className="mt-4 grid gap-3 border-t border-[#edf0f6] pt-4 sm:grid-cols-4">
+                  <div className="mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-4">
                     <MiniMetric label="Est. total cost" value={`USD ${formatNumber(country.decision?.estimatedAnnualCostUsd ?? 0)}`} />
                     <MiniMetric label="Job market" value={country.meta?.jobMarketStrength ?? "-"} />
                     <MiniMetric label="Scholarships" value={country.meta?.scholarshipAvailability ?? "-"} />
@@ -1108,10 +1108,10 @@ function SummaryView({
         </section>
 
         <aside className="space-y-4">
-          <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
+          <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
             <div className="mb-4 flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-[#5f3bd7]" strokeWidth={1.8} aria-hidden="true" />
-              <h2 className="text-base font-semibold text-[#182033]">Why {topCountry?.name} is recommended</h2>
+              <Trophy className="h-5 w-5 text-primary" strokeWidth={1.8} aria-hidden="true" />
+              <h2 className="text-base font-semibold text-foreground">Why {topCountry?.name} is recommended</h2>
             </div>
             <div className="space-y-3">
               {(topCountry?.meta?.highlights ?? []).slice(0, 5).map((highlight) => (
@@ -1120,7 +1120,7 @@ function SummaryView({
             </div>
           </section>
 
-          <section className="rounded-xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+          <section className="rounded-xl border border-warning/30 bg-warning/10 p-5 shadow-sm">
             <h2 className="text-base font-semibold text-[#7c4a03]">Considerations</h2>
             <div className="mt-4 space-y-3">
               {(topCountry?.meta?.considerations ?? []).map((consideration) => (
@@ -1133,7 +1133,7 @@ function SummaryView({
           </section>
 
           <section className="rounded-xl border border-[#d8e7ff] bg-[#f5f9ff] p-5 shadow-sm">
-            <h2 className="text-base font-semibold text-[#182033]">What should you do next?</h2>
+            <h2 className="text-base font-semibold text-foreground">What should you do next?</h2>
             <div className="mt-4 space-y-2">
               <ActionRow label={`Find universities in ${topCountry?.name ?? "selected country"}`} onClick={onFindUniversities} />
               <ActionRow label={`Explore scholarships in ${topCountry?.name ?? "selected country"}`} onClick={onFindScholarships} />
@@ -1143,22 +1143,22 @@ function SummaryView({
         </aside>
       </div>
 
-      <section className="rounded-xl border border-emerald-100 bg-emerald-50 p-5 shadow-sm">
+      <section className="rounded-xl border border-success/30 bg-success/10 p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-[#182033]">Ready to take the next step?</h2>
-            <p className="mt-1 text-sm text-[#667085]">Save the recommended country to personalize university and scholarship recommendations.</p>
+            <h2 className="text-lg font-semibold text-foreground">Ready to take the next step?</h2>
+            <p className="mt-1 text-sm text-foreground-muted">Save the recommended country to personalize university and scholarship recommendations.</p>
           </div>
           <div className="grid gap-2 sm:grid-cols-3 lg:w-[700px]">
-            <button type="button" onClick={onSaveCountry} disabled={Boolean(savingCountryId)} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#5f3bd7] text-sm font-semibold text-white shadow-sm hover:bg-[#4f2fca] disabled:cursor-not-allowed disabled:opacity-60">
+            <button type="button" onClick={onSaveCountry} disabled={Boolean(savingCountryId)} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-white shadow-sm hover:bg-primary disabled:cursor-not-allowed disabled:opacity-60">
               <Heart className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Save {topCountry?.name ?? "country"}
             </button>
-            <button type="button" onClick={onFindUniversities} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-white text-sm font-semibold text-[#5f3bd7] hover:bg-[#f7f5ff]">
+            <button type="button" onClick={onFindUniversities} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface text-sm font-semibold text-primary hover:bg-surface-muted">
               <Landmark className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Find universities
             </button>
-            <button type="button" onClick={onFindScholarships} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-white text-sm font-semibold text-[#5f3bd7] hover:bg-[#f7f5ff]">
+            <button type="button" onClick={onFindScholarships} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface text-sm font-semibold text-primary hover:bg-surface-muted">
               <GraduationCap className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               Find scholarships
             </button>
@@ -1191,8 +1191,8 @@ function DetailTabContent({ country, activeTab }: { country: Country; activeTab:
           <FactRow icon={ClipboardCheck} label="PR pathway" value={country.meta?.prPathwayDifficulty ?? "Moderate"} />
         </DetailPanel>
         <DetailPanel title="Official information">
-          <p className="text-sm leading-6 text-[#667085]">Always confirm visa requirements through official immigration pages before applying.</p>
-          <a href={country.meta?.officialVisaUrl ?? "#"} target="_blank" rel="noreferrer" className="mt-4 inline-flex h-10 items-center gap-2 rounded-lg border border-[#cfc7ff] bg-white px-4 text-sm font-semibold text-[#5f3bd7] hover:bg-[#f7f5ff]">
+          <p className="text-sm leading-6 text-foreground-muted">Always confirm visa requirements through official immigration pages before applying.</p>
+          <a href={country.meta?.officialVisaUrl ?? "#"} target="_blank" rel="noreferrer" className="mt-4 inline-flex h-10 items-center gap-2 rounded-lg border border-[#cfc7ff] bg-surface px-4 text-sm font-semibold text-primary hover:bg-surface-muted">
             Official visa page
             <ExternalLink className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           </a>
@@ -1213,13 +1213,13 @@ function DetailTabContent({ country, activeTab }: { country: Country; activeTab:
 
   if (activeTab === "Scholarships") {
     return (
-      <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-[#182033]">Scholarships in {country.name}</h2>
+      <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+        <h2 className="text-base font-semibold text-foreground">Scholarships in {country.name}</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {(country.matchingScholarships ?? []).map((scholarship) => (
-            <div key={scholarship.id} className="rounded-lg border border-[#edf0f6] p-4">
-              <p className="text-sm font-semibold text-[#182033]">{scholarship.name}</p>
-              <p className="mt-1 text-sm text-[#667085]">{scholarship.coverageType} - {scholarship.amountUsd ? `USD ${formatNumber(scholarship.amountUsd)}` : "Amount varies"}</p>
+            <div key={scholarship.id} className="rounded-lg border border-border p-4">
+              <p className="text-sm font-semibold text-foreground">{scholarship.name}</p>
+              <p className="mt-1 text-sm text-foreground-muted">{scholarship.coverageType} - {scholarship.amountUsd ? `USD ${formatNumber(scholarship.amountUsd)}` : "Amount varies"}</p>
             </div>
           ))}
         </div>
@@ -1229,9 +1229,9 @@ function DetailTabContent({ country, activeTab }: { country: Country; activeTab:
 
   if (activeTab === "Job Market") {
     return (
-      <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-[#182033]">Career fit</h2>
-        <p className="mt-2 text-sm leading-6 text-[#667085]">{country.decision?.recommendation}</p>
+      <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+        <h2 className="text-base font-semibold text-foreground">Career fit</h2>
+        <p className="mt-2 text-sm leading-6 text-foreground-muted">{country.decision?.recommendation}</p>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <MiniMetric label="Market strength" value={country.meta?.jobMarketStrength ?? "-"} />
           <MiniMetric label="Work after study" value={`${country.postStudyWorkVisaMonths} months`} />
@@ -1243,13 +1243,13 @@ function DetailTabContent({ country, activeTab }: { country: Country; activeTab:
 
   if (activeTab === "Cities") {
     return (
-      <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
-        <h2 className="text-base font-semibold text-[#182033]">Popular student cities</h2>
+      <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+        <h2 className="text-base font-semibold text-foreground">Popular student cities</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {(country.meta?.popularCities ?? []).map((city) => (
-            <div key={city} className="rounded-lg border border-[#edf0f6] bg-[#fbfcff] p-4">
-              <MapPin className="h-5 w-5 text-[#5f3bd7]" strokeWidth={1.8} aria-hidden="true" />
-              <p className="mt-3 text-sm font-semibold text-[#182033]">{city}</p>
+            <div key={city} className="rounded-lg border border-border bg-[#fbfcff] p-4">
+              <MapPin className="h-5 w-5 text-primary" strokeWidth={1.8} aria-hidden="true" />
+              <p className="mt-3 text-sm font-semibold text-foreground">{city}</p>
             </div>
           ))}
         </div>
@@ -1268,7 +1268,7 @@ function DetailTabContent({ country, activeTab }: { country: Country; activeTab:
           </div>
         </DetailPanel>
         <DetailPanel title="Student insight">
-          <p className="text-sm leading-6 text-[#667085]">{country.meta?.insight}</p>
+          <p className="text-sm leading-6 text-foreground-muted">{country.meta?.insight}</p>
         </DetailPanel>
       </section>
     );
@@ -1286,14 +1286,14 @@ function DetailTabContent({ country, activeTab }: { country: Country; activeTab:
 
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
         <DetailPanel title={`About ${country.name}`}>
-          <p className="text-sm leading-6 text-[#667085]">{country.notes ?? country.meta?.insight}</p>
+          <p className="text-sm leading-6 text-foreground-muted">{country.notes ?? country.meta?.insight}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {(country.meta?.highlights ?? []).slice(0, 4).map((highlight) => (
-              <span key={highlight} className="rounded-full bg-[#f3efff] px-3 py-1 text-xs font-semibold text-[#5f3bd7]">{highlight}</span>
+              <span key={highlight} className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">{highlight}</span>
             ))}
           </div>
         </DetailPanel>
-        <div className="overflow-hidden rounded-xl border border-[#e3e8f4] bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
           <div className="h-64" style={{ background: getCountryTheme(country.name) }}>
             <div className="flex h-full items-end bg-gradient-to-t from-black/45 to-transparent p-5">
               <div className="text-white">
@@ -1353,19 +1353,19 @@ function SelectionPanel({
   onCompare: () => void;
 }) {
   return (
-    <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
+    <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-base font-semibold text-[#182033]">Selected countries ({selectedCountries.length}/4)</h2>
-        <button type="button" onClick={() => selectedCountries.forEach((country) => onRemoveCountry(country.id))} className="text-xs font-semibold text-[#5f3bd7]">Clear all</button>
+        <h2 className="text-base font-semibold text-foreground">Selected countries ({selectedCountries.length}/4)</h2>
+        <button type="button" onClick={() => selectedCountries.forEach((country) => onRemoveCountry(country.id))} className="text-xs font-semibold text-primary">Clear all</button>
       </div>
       <div className="space-y-2">
         {selectedCountries.map((country) => (
-          <div key={country.id} className="flex items-center justify-between rounded-lg border border-[#e7eaf3] bg-white px-3 py-2">
+          <div key={country.id} className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2">
             <div className="flex items-center gap-2">
               <FlagMark countryName={country.name} small />
-              <span className="text-sm font-semibold text-[#182033]">{country.name}</span>
+              <span className="text-sm font-semibold text-foreground">{country.name}</span>
             </div>
-            <button type="button" onClick={() => onRemoveCountry(country.id)} title={`Remove ${country.name}`} className="text-[#8b95aa] hover:text-[#344054]">
+            <button type="button" onClick={() => onRemoveCountry(country.id)} title={`Remove ${country.name}`} className="text-[#8b95aa] hover:text-foreground">
               <X className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
             </button>
           </div>
@@ -1376,7 +1376,7 @@ function SelectionPanel({
             onSetCountryToAdd(event.target.value);
             onAddCountry(event.target.value);
           }}
-          className="h-11 w-full rounded-lg border border-dashed border-[#cfc7ff] bg-white px-3 text-sm font-medium text-[#5f3bd7] outline-none"
+          className="h-11 w-full rounded-lg border border-dashed border-[#cfc7ff] bg-surface px-3 text-sm font-medium text-primary outline-none"
         >
           <option value="">Add another country</option>
           {countries.filter((country) => !selectedCountries.some((selected) => selected.id === country.id)).map((country) => (
@@ -1388,12 +1388,12 @@ function SelectionPanel({
         type="button"
         onClick={onCompare}
         disabled={selectedCountries.length < 2 || comparing}
-        className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#5f3bd7] text-sm font-semibold text-white shadow-sm hover:bg-[#4f2fca] disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-white shadow-sm hover:bg-primary disabled:cursor-not-allowed disabled:opacity-60"
       >
         <SlidersHorizontal className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
         {comparing ? "Comparing..." : "Compare countries"}
       </button>
-      <p className="mt-3 text-center text-xs font-medium text-[#7a8194]">See side-by-side comparison</p>
+      <p className="mt-3 text-center text-xs font-medium text-foreground-subtle">See side-by-side comparison</p>
     </section>
   );
 }
@@ -1409,16 +1409,16 @@ function ProfileSummaryPanel({ profile, profileCompletion, compact = false }: { 
   ];
 
   return (
-    <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
+    <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-base font-semibold text-[#182033]">Your profile summary</h2>
-        <span className="text-xs font-semibold text-[#5f3bd7]">{profileCompletion}%</span>
+        <h2 className="text-base font-semibold text-foreground">Your profile summary</h2>
+        <span className="text-xs font-semibold text-primary">{profileCompletion}%</span>
       </div>
       <div className={`grid gap-3 ${compact ? "" : ""}`}>
         {rows.map(([label, value]) => (
           <div key={label} className="flex items-center justify-between gap-3 border-b border-[#f0f2f7] pb-2 last:border-0 last:pb-0">
-            <span className="text-xs font-semibold text-[#667085]">{label}</span>
-            <span className="max-w-[160px] text-right text-xs font-semibold text-[#27314f]">{value}</span>
+            <span className="text-xs font-semibold text-foreground-muted">{label}</span>
+            <span className="max-w-[160px] text-right text-xs font-semibold text-foreground">{value}</span>
           </div>
         ))}
       </div>
@@ -1428,10 +1428,10 @@ function ProfileSummaryPanel({ profile, profileCompletion, compact = false }: { 
 
 function TipPanel() {
   return (
-    <section className="rounded-xl border border-emerald-100 bg-emerald-50 p-4 shadow-sm">
+    <section className="rounded-xl border border-success/30 bg-success/10 p-4 shadow-sm">
       <div className="flex gap-3">
-        <Lightbulb className="h-5 w-5 shrink-0 text-emerald-600" strokeWidth={1.8} aria-hidden="true" />
-        <p className="text-sm font-medium leading-6 text-emerald-800">Add target countries, budget, test score, and career goal in your profile for sharper country recommendations.</p>
+        <Lightbulb className="h-5 w-5 shrink-0 text-success" strokeWidth={1.8} aria-hidden="true" />
+        <p className="text-sm font-medium leading-6 text-success">Add target countries, budget, test score, and career goal in your profile for sharper country recommendations.</p>
       </div>
     </section>
   );
@@ -1439,11 +1439,11 @@ function TipPanel() {
 
 function CountryExplorerCard({ country, selected, onToggle, onOpenDetail }: { country: Country; selected: boolean; onToggle: () => void; onOpenDetail: () => void }) {
   return (
-    <article className={`overflow-hidden rounded-xl border bg-white shadow-sm transition ${selected ? "border-[#8b6df7] ring-2 ring-[#ece7ff]" : "border-[#e3e8f4] hover:border-[#cfc7ff]"}`}>
+    <article className={`overflow-hidden rounded-xl border bg-surface shadow-sm transition ${selected ? "border-[#8b6df7] ring-2 ring-[#ece7ff]" : "border-border hover:border-[#cfc7ff]"}`}>
       <div className="h-28" style={{ background: getCountryTheme(country.name) }}>
         <div className="flex h-full items-start justify-between bg-gradient-to-t from-black/35 to-white/5 p-3">
           <FlagMark countryName={country.name} />
-          <button type="button" onClick={onToggle} title={selected ? "Remove from comparison" : "Add to comparison"} className={`flex h-8 w-8 items-center justify-center rounded-lg ${selected ? "bg-[#5f3bd7] text-white" : "bg-white/90 text-[#5f3bd7]"}`}>
+          <button type="button" onClick={onToggle} title={selected ? "Remove from comparison" : "Add to comparison"} className={`flex h-8 w-8 items-center justify-center rounded-lg ${selected ? "bg-primary text-white" : "bg-surface/90 text-primary"}`}>
             {selected ? <CheckCircle2 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" /> : <Bookmark className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />}
           </button>
         </div>
@@ -1451,8 +1451,8 @@ function CountryExplorerCard({ country, selected, onToggle, onOpenDetail }: { co
       <div className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-base font-semibold text-[#182033]">{country.name}</h3>
-            <p className="mt-1 line-clamp-2 text-sm leading-5 text-[#667085]">{country.meta?.insight ?? country.notes}</p>
+            <h3 className="text-base font-semibold text-foreground">{country.name}</h3>
+            <p className="mt-1 line-clamp-2 text-sm leading-5 text-foreground-muted">{country.meta?.insight ?? country.notes}</p>
           </div>
           <ScorePill score={scoreOf(country)} />
         </div>
@@ -1466,7 +1466,7 @@ function CountryExplorerCard({ country, selected, onToggle, onOpenDetail }: { co
           <MiniMetric label="Monthly" value={`$${formatNumber(country.averageLivingCostUsd)}`} />
           <MiniMetric label="Work" value={`${country.postStudyWorkVisaMonths}m`} />
         </div>
-        <button type="button" onClick={onOpenDetail} className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-[#dce3f0] bg-white text-sm font-semibold text-[#344054] hover:bg-[#f8fafc]">
+        <button type="button" onClick={onOpenDetail} className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface text-sm font-semibold text-foreground hover:bg-surface-muted">
           View details
           <ChevronRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
         </button>
@@ -1477,18 +1477,18 @@ function CountryExplorerCard({ country, selected, onToggle, onOpenDetail }: { co
 
 function RankingPanel({ countries }: { countries: Country[] }) {
   return (
-    <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
-      <h2 className="text-base font-semibold text-[#182033]">Overall ranking</h2>
-      <p className="mt-1 text-xs font-medium text-[#667085]">Based on profile and priorities</p>
+    <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+      <h2 className="text-base font-semibold text-foreground">Overall ranking</h2>
+      <p className="mt-1 text-xs font-medium text-foreground-muted">Based on profile and priorities</p>
       <div className="mt-4 space-y-3">
         {countries.map((country, index) => (
           <div key={country.id} className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <RankBadge rank={index + 1} small />
               <FlagMark countryName={country.name} small />
-              <span className="truncate text-sm font-semibold text-[#182033]">{country.name}</span>
+              <span className="truncate text-sm font-semibold text-foreground">{country.name}</span>
             </div>
-            <span className="rounded-lg border border-[#edf0f6] px-2 py-1 text-xs font-semibold text-[#344054]">{scoreOf(country)} / 100</span>
+            <span className="rounded-lg border border-border px-2 py-1 text-xs font-semibold text-foreground">{scoreOf(country)} / 100</span>
           </div>
         ))}
       </div>
@@ -1498,8 +1498,8 @@ function RankingPanel({ countries }: { countries: Country[] }) {
 
 function RadarPanel({ countries }: { countries: Country[] }) {
   return (
-    <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
-      <h2 className="text-base font-semibold text-[#182033]">Profile match breakdown</h2>
+    <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+      <h2 className="text-base font-semibold text-foreground">Profile match breakdown</h2>
       <div className="mt-4">
         <RadarChart countries={countries.slice(0, 3)} />
       </div>
@@ -1509,8 +1509,8 @@ function RadarPanel({ countries }: { countries: Country[] }) {
 
 function NextStepsPanel({ onSummary, onOpenDetail }: { onSummary: () => void; onOpenDetail: () => void }) {
   return (
-    <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
-      <h2 className="text-base font-semibold text-[#182033]">What is next?</h2>
+    <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+      <h2 className="text-base font-semibold text-foreground">What is next?</h2>
       <div className="mt-4 space-y-2">
         <ActionRow label="View recommendation summary" onClick={onSummary} />
         <ActionRow label="Inspect top country details" onClick={onOpenDetail} />
@@ -1522,14 +1522,14 @@ function NextStepsPanel({ onSummary, onOpenDetail }: { onSummary: () => void; on
 function CompareRow({ icon: Icon, label, countries, render }: { icon: ElementType; label: string; countries: Country[]; render: (country: Country) => React.ReactNode }) {
   return (
     <tr>
-      <td className="px-4 py-4 font-semibold text-[#344054]">
+      <td className="px-4 py-4 font-semibold text-foreground">
         <div className="flex items-center gap-2">
-          <Icon className="h-4 w-4 text-[#6d3df4]" strokeWidth={1.8} aria-hidden="true" />
+          <Icon className="h-4 w-4 text-primary" strokeWidth={1.8} aria-hidden="true" />
           <span>{label}</span>
         </div>
       </td>
       {countries.map((country) => (
-        <td key={country.id} className="px-4 py-4 text-[#27314f]">{render(country)}</td>
+        <td key={country.id} className="px-4 py-4 text-foreground">{render(country)}</td>
       ))}
     </tr>
   );
@@ -1588,22 +1588,22 @@ function RadarChart({ countries }: { countries: Country[] }) {
 
 function StatTile({ icon: Icon, label, value, accent }: { icon: ElementType; label: string; value: string; accent: "green" | "purple" | "orange" | "blue" | "pink" }) {
   const accents = {
-    green: "bg-emerald-50 text-emerald-600",
-    purple: "bg-[#f3efff] text-[#6d3df4]",
-    orange: "bg-orange-50 text-orange-600",
-    blue: "bg-blue-50 text-blue-600",
+    green: "bg-success/10 text-success",
+    purple: "bg-primary/10 text-primary",
+    orange: "bg-warning/10 text-warning",
+    blue: "bg-info/10 text-info",
     pink: "bg-pink-50 text-pink-600"
   };
 
   return (
-    <div className="rounded-xl border border-[#e3e8f4] bg-white p-4 shadow-sm">
+    <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
       <div className="flex items-center gap-3">
         <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${accents[accent]}`}>
           <Icon className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
         </span>
         <div>
-          <p className="text-xl font-semibold text-[#182033]">{value}</p>
-          <p className="text-xs font-semibold text-[#667085]">{label}</p>
+          <p className="text-xl font-semibold text-foreground">{value}</p>
+          <p className="text-xs font-semibold text-foreground-muted">{label}</p>
         </div>
       </div>
     </div>
@@ -1613,11 +1613,11 @@ function StatTile({ icon: Icon, label, value, accent }: { icon: ElementType; lab
 function FilterSelect({ label, value, options, onChange }: { label: string; value: string; options: Array<{ value: string; label: string }>; onChange: (value: string) => void }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-xs font-semibold text-[#344054]">{label}</span>
+      <span className="mb-2 block text-xs font-semibold text-foreground">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 w-full rounded-lg border border-[#dce3f0] bg-white px-3 text-sm font-medium text-[#27314f] outline-none focus:border-[#8b6df7] focus:ring-2 focus:ring-[#ece7ff]"
+        className="h-11 w-full rounded-lg border border-border bg-surface px-3 text-sm font-medium text-foreground outline-none focus:border-[#8b6df7] focus:ring-2 focus:ring-[#ece7ff]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>{option.label}</option>
@@ -1629,7 +1629,7 @@ function FilterSelect({ label, value, options, onChange }: { label: string; valu
 
 function CheckFilter({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
   return (
-    <label className="flex items-center gap-2 text-sm font-medium text-[#344054]">
+    <label className="flex items-center gap-2 text-sm font-medium text-foreground">
       <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="h-4 w-4 rounded border-[#cfd6e3] accent-[#5f3bd7]" />
       <span>{label}</span>
     </label>
@@ -1637,7 +1637,7 @@ function CheckFilter({ label, checked, onChange }: { label: string; checked: boo
 }
 
 function StepBadge({ label }: { label: string }) {
-  return <span className="rounded-full bg-[#f3efff] px-3 py-1 text-xs font-semibold text-[#5f3bd7]">{label}</span>;
+  return <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">{label}</span>;
 }
 
 function ScoreRing({ score, size }: { score: number; size: "sm" | "md" }) {
@@ -1653,39 +1653,39 @@ function ScoreRing({ score, size }: { score: number; size: "sm" | "md" }) {
         <circle cx={dimension / 2} cy={dimension / 2} r={radius} fill="none" stroke="#ece7fb" strokeWidth={stroke} />
         <circle cx={dimension / 2} cy={dimension / 2} r={radius} fill="none" stroke={score >= 85 ? "#16a34a" : score >= 70 ? "#f59e0b" : "#ef4444"} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} />
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-[#182033]">{score}%</div>
+      <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-foreground">{score}%</div>
     </div>
   );
 }
 
 function ScorePill({ score }: { score: number }) {
-  return <span className="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">{score}</span>;
+  return <span className="rounded-full bg-success/10 px-3 py-1 text-sm font-semibold text-success">{score}</span>;
 }
 
 function SmallTag({ children }: { children: React.ReactNode }) {
-  return <span className="rounded-full bg-[#f4f6fb] px-2.5 py-1 text-xs font-semibold text-[#667085]">{children}</span>;
+  return <span className="rounded-full bg-[#f4f6fb] px-2.5 py-1 text-xs font-semibold text-foreground-muted">{children}</span>;
 }
 
 function MiniMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-[#f8f9fc] px-3 py-2">
-      <p className="text-[11px] font-semibold text-[#667085]">{label}</p>
-      <p className="mt-1 break-words text-sm font-semibold text-[#182033]">{value}</p>
+    <div className="rounded-lg bg-surface-muted px-3 py-2">
+      <p className="text-[11px] font-semibold text-foreground-muted">{label}</p>
+      <p className="mt-1 break-words text-sm font-semibold text-foreground">{value}</p>
     </div>
   );
 }
 
 function InfoCard({ icon: Icon, title, value, caption }: { icon: ElementType; title: string; value: string; caption: string }) {
   return (
-    <article className="min-h-[128px] rounded-xl border border-[#e3e8f4] bg-white p-4 shadow-sm">
+    <article className="min-h-[128px] rounded-xl border border-border bg-surface p-4 shadow-sm">
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#f3efff] text-[#6d3df4]">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
           <Icon className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
         </span>
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-[#667085]">{title}</p>
-          <p className="mt-1 break-words text-lg font-semibold leading-6 text-[#182033]">{value}</p>
-          <p className="mt-1 text-xs font-medium leading-5 text-[#7a8194]">{caption}</p>
+          <p className="text-xs font-semibold text-foreground-muted">{title}</p>
+          <p className="mt-1 break-words text-lg font-semibold leading-6 text-foreground">{value}</p>
+          <p className="mt-1 text-xs font-medium leading-5 text-foreground-subtle">{caption}</p>
         </div>
       </div>
     </article>
@@ -1694,8 +1694,8 @@ function InfoCard({ icon: Icon, title, value, caption }: { icon: ElementType; ti
 
 function DetailPanel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-[#e3e8f4] bg-white p-5 shadow-sm">
-      <h2 className="text-base font-semibold text-[#182033]">{title}</h2>
+    <section className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+      <h2 className="text-base font-semibold text-foreground">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -1704,19 +1704,19 @@ function DetailPanel({ title, children }: { title: string; children: React.React
 function FactRow({ icon: Icon, label, value }: { icon: ElementType; label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3 border-b border-[#f0f2f7] pb-3 last:border-0 last:pb-0">
-      <div className="flex items-center gap-2 text-sm font-medium text-[#667085]">
-        <Icon className="h-4 w-4 text-[#6d3df4]" strokeWidth={1.8} aria-hidden="true" />
+      <div className="flex items-center gap-2 text-sm font-medium text-foreground-muted">
+        <Icon className="h-4 w-4 text-primary" strokeWidth={1.8} aria-hidden="true" />
         <span>{label}</span>
       </div>
-      <span className="max-w-[170px] text-right text-sm font-semibold text-[#182033]">{value}</span>
+      <span className="max-w-[170px] text-right text-sm font-semibold text-foreground">{value}</span>
     </div>
   );
 }
 
 function CheckLine({ text }: { text: string }) {
   return (
-    <div className="flex gap-3 text-sm font-medium leading-6 text-[#344054]">
-      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={1.8} aria-hidden="true" />
+    <div className="flex gap-3 text-sm font-medium leading-6 text-foreground">
+      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" strokeWidth={1.8} aria-hidden="true" />
       <span>{text}</span>
     </div>
   );
@@ -1725,12 +1725,12 @@ function CheckLine({ text }: { text: string }) {
 function RecommendationTile({ icon: Icon, label, value }: { icon: ElementType; label: string; value: string }) {
   return (
     <div className="flex gap-3">
-      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-emerald-600">
+      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface text-success">
         <Icon className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
       </span>
       <div>
-        <p className="text-xs font-semibold text-emerald-700">{label}</p>
-        <p className="mt-1 text-sm font-semibold text-[#182033]">{value}</p>
+        <p className="text-xs font-semibold text-success">{label}</p>
+        <p className="mt-1 text-sm font-semibold text-foreground">{value}</p>
       </div>
     </div>
   );
@@ -1738,20 +1738,20 @@ function RecommendationTile({ icon: Icon, label, value }: { icon: ElementType; l
 
 function ActionRow({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="flex h-11 w-full items-center justify-between rounded-lg bg-white px-3 text-left text-sm font-semibold text-[#344054] hover:bg-[#f8fafc]">
+    <button type="button" onClick={onClick} className="flex h-11 w-full items-center justify-between rounded-lg bg-surface px-3 text-left text-sm font-semibold text-foreground hover:bg-surface-muted">
       <span>{label}</span>
-      <ArrowRight className="h-4 w-4 text-[#5f3bd7]" strokeWidth={1.8} aria-hidden="true" />
+      <ArrowRight className="h-4 w-4 text-primary" strokeWidth={1.8} aria-hidden="true" />
     </button>
   );
 }
 
 function EmptyPanel({ title, description, actionLabel, onAction }: { title: string; description: string; actionLabel: string; onAction: () => void }) {
   return (
-    <section className="rounded-xl border border-dashed border-[#cfd6e3] bg-white p-10 text-center shadow-sm">
-      <Globe2 className="mx-auto h-8 w-8 text-[#5f3bd7]" strokeWidth={1.8} aria-hidden="true" />
-      <h2 className="mt-4 text-lg font-semibold text-[#182033]">{title}</h2>
-      <p className="mt-2 text-sm text-[#667085]">{description}</p>
-      <button type="button" onClick={onAction} className="mt-5 inline-flex h-10 items-center justify-center rounded-lg bg-[#5f3bd7] px-4 text-sm font-semibold text-white hover:bg-[#4f2fca]">
+    <section className="rounded-xl border border-dashed border-[#cfd6e3] bg-surface p-10 text-center shadow-sm">
+      <Globe2 className="mx-auto h-8 w-8 text-primary" strokeWidth={1.8} aria-hidden="true" />
+      <h2 className="mt-4 text-lg font-semibold text-foreground">{title}</h2>
+      <p className="mt-2 text-sm text-foreground-muted">{description}</p>
+      <button type="button" onClick={onAction} className="mt-5 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-white hover:bg-primary">
         {actionLabel}
       </button>
     </section>
@@ -1761,10 +1761,10 @@ function EmptyPanel({ title, description, actionLabel, onAction }: { title: stri
 function CountryLoading() {
   return (
     <div className="mx-auto max-w-[1220px] space-y-5">
-      <div className="h-28 animate-pulse rounded-xl bg-white" />
+      <div className="h-28 animate-pulse rounded-xl bg-surface" />
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="h-64 animate-pulse rounded-xl bg-white lg:col-span-2" />
-        <div className="h-64 animate-pulse rounded-xl bg-white" />
+        <div className="h-64 animate-pulse rounded-xl bg-surface lg:col-span-2" />
+        <div className="h-64 animate-pulse rounded-xl bg-surface" />
       </div>
     </div>
   );
@@ -1782,7 +1782,7 @@ function FlagMark({ countryName, small = false }: { countryName: string; small?:
 
 function FlagPoster({ countryName }: { countryName: string }) {
   return (
-    <div className="h-20 w-28 shrink-0 overflow-hidden rounded-xl border border-[#e3e8f4] shadow-sm">
+    <div className="h-20 w-28 shrink-0 overflow-hidden rounded-xl border border-border shadow-sm">
       <div className="h-full w-full" style={{ background: getFlagBackground(countryName) }} />
     </div>
   );
@@ -1805,7 +1805,7 @@ function LogoBox({ label }: { label: string }) {
 }
 
 function RankBadge({ rank, small = false }: { rank: number; small?: boolean }) {
-  const colors = rank === 1 ? "bg-amber-100 text-amber-700" : rank === 2 ? "bg-slate-100 text-slate-600" : "bg-orange-100 text-orange-700";
+  const colors = rank === 1 ? "bg-warning/10 text-warning" : rank === 2 ? "bg-surface-muted text-foreground-muted" : "bg-warning/10 text-warning";
 
   return <span className={`flex ${small ? "h-7 w-7 text-xs" : "h-9 w-9 text-sm"} shrink-0 items-center justify-center rounded-full font-semibold ${colors}`}>{rank}</span>;
 }
