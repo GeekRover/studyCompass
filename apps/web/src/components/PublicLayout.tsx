@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/Button";
 import { ThemeToggle } from "./ui/ThemeToggle";
@@ -10,6 +12,12 @@ const footerLinks = [
   { label: "Visa prep", to: "/register" }
 ];
 
+const sectionLinks = [
+  { label: "Features", href: "#features" },
+  { label: "How it works", href: "#how" },
+  { label: "FAQ", href: "#faq" }
+];
+
 export function PublicLayout({
   children,
   tone = "app"
@@ -19,6 +27,12 @@ export function PublicLayout({
 }) {
   const landing = tone === "landing";
   const { pathname } = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -27,23 +41,78 @@ export function PublicLayout({
           <div className="flex items-center gap-8">
             <Logo />
             {landing && (
-              <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
-                <a href="#features" className="link-wipe hover:text-foreground">Features</a>
-                <a href="#how" className="link-wipe hover:text-foreground">How it works</a>
-                <a href="#faq" className="link-wipe hover:text-foreground">FAQ</a>
+              <nav className="hidden items-center gap-6 text-sm text-foreground-muted md:flex">
+                {sectionLinks.map((link) => (
+                  <a key={link.href} href={link.href} className="link-wipe hover:text-foreground">
+                    {link.label}
+                  </a>
+                ))}
               </nav>
             )}
           </div>
           <div className="flex items-center gap-1 sm:gap-2">
-            <ThemeToggle />
-            <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
+            <div className={landing ? "hidden items-center md:flex" : "flex items-center"}>
+              <ThemeToggle />
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={landing ? "hidden md:inline-flex" : "hidden sm:inline-flex"}
+              asChild
+            >
               <Link to="/login" viewTransition>Log in</Link>
             </Button>
-            <Button size="sm" asChild>
+            <Button size="sm" className={landing ? "hidden md:inline-flex" : undefined} asChild>
               <Link to="/register" viewTransition>Get started</Link>
             </Button>
+            {landing && (
+              <button
+                type="button"
+                onClick={() => setMenuOpen((open) => !open)}
+                className="inline-flex items-center justify-center rounded-md p-2 text-foreground-muted hover:bg-surface-muted md:hidden"
+                aria-label={menuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={menuOpen}
+              >
+                {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            )}
           </div>
         </div>
+
+        {landing && menuOpen && (
+          <div className="border-t border-border bg-background md:hidden">
+            <nav className="mx-auto flex max-w-5xl flex-col gap-1 px-4 py-3 text-sm sm:px-6">
+              {sectionLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMenu}
+                  className="rounded-lg px-2 py-2.5 text-foreground-muted hover:bg-surface-muted hover:text-foreground"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <div className="my-1 border-t border-border" />
+              <Link
+                to="/login"
+                viewTransition
+                onClick={closeMenu}
+                className="rounded-lg px-2 py-2.5 font-medium text-foreground hover:bg-surface-muted"
+              >
+                Log in
+              </Link>
+              <Button className="mt-1 w-full" asChild>
+                <Link to="/register" viewTransition onClick={closeMenu}>
+                  Get started
+                </Link>
+              </Button>
+              <div className="mt-2 flex items-center justify-between rounded-lg px-2 py-1">
+                <span className="text-foreground-muted">Appearance</span>
+                <ThemeToggle />
+              </div>
+            </nav>
+          </div>
+        )}
       </header>
 
       <main className="flex-1">
