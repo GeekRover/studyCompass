@@ -22,7 +22,9 @@ spreadsheet that grows a tab a week. StudyCompass turns it into one plan built
 around a student's profile: grades, budget, and goals in — a ranked shortlist and
 a clear next step out.
 
-<!-- Add screenshots here: drop images in docs/ and reference them. -->
+<p align="center">
+  <img src="docs/landing.png" alt="StudyCompass landing page" width="920">
+</p>
 
 ## ✨ Features
 
